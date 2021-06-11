@@ -14,14 +14,14 @@ model Movie {
   id                String              @id @default(uuid())
   title             String
   releaseDate       DateTime
-  runtime           Int /// minutes
+  runtime           Int? /// minutes
   story             String
-  rating            Rating              @relation(fields: [ratingId], references: [id])
-  ratingId          Int
+  rating            Rating?             @relation(fields: [ratingId], references: [id])
+  ratingId          Int?
   MoviesOnActors    MoviesOnActors[]
   MoviesOnStaffs    MoviesOnStaffs[]
   MoviesOnCompanies MoviesOnCompanies[]
-  OfficialSite      OfficialSite[]
+  OfficialSite      OfficialSite?
   MoviesOnGenres    MoviesOnGenres[]
 }
 
@@ -42,10 +42,10 @@ model MoviesOnActors {
 model Actor {
   id             String           @id @default(uuid())
   name           String
-  birthday       DateTime
+  birthday       DateTime?
   MoviesOnActors MoviesOnActors[]
-  gender         Gender           @relation(fields: [genderId], references: [id])
-  genderId       Int
+  gender         Gender?          @relation(fields: [genderId], references: [id])
+  genderId       Int?
 }
 
 model Gender {
@@ -55,10 +55,10 @@ model Gender {
 }
 
 model Occupation {
-  id      Int     @id @default(autoincrement())
-  name    String  @unique
-  Staff   Staff?  @relation(fields: [staffId], references: [id])
-  staffId String?
+  id      Int    @id @default(autoincrement())
+  name    String @unique
+  Staff   Staff  @relation(fields: [staffId], references: [id])
+  staffId String
 }
 
 model Staff {
@@ -85,8 +85,8 @@ model CompanyType {
 model Company {
   id                String              @id @default(uuid())
   name              String
-  type              CompanyType         @relation(fields: [typeId], references: [id])
-  typeId            Int
+  type              CompanyType?        @relation(fields: [typeId], references: [id])
+  typeId            Int?
   MoviesOnCompanies MoviesOnCompanies[]
 }
 
@@ -102,7 +102,7 @@ model OfficialSite {
   id      String @id @default(uuid())
   movie   Movie  @relation(fields: [movieId], references: [id])
   movieId String
-  link    String @unique
+  link    String
 }
 
 model Genre {
@@ -115,6 +115,6 @@ model MoviesOnGenres {
   id      Int    @id @default(autoincrement())
   movie   Movie  @relation(fields: [movieId], references: [id])
   movieId String
-  genre   Genre  @relation(fields: [genreId], references: [id])
-  genreId Int
+  genre   Genre? @relation(fields: [genreId], references: [id])
+  genreId Int?
 }
