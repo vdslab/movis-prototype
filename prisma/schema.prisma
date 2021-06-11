@@ -9,3 +9,112 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+
+model Movie {
+  id                String              @id @default(uuid())
+  title             String
+  releaseDate       DateTime
+  runtime           Int /// minutes
+  story             String
+  rating            Rating              @relation(fields: [ratingId], references: [id])
+  ratingId          Int
+  MoviesOnActors    MoviesOnActors[]
+  MoviesOnStaffs    MoviesOnStaffs[]
+  MoviesOnCompanies MoviesOnCompanies[]
+  OfficialSite      OfficialSite[]
+  MoviesOnGenres    MoviesOnGenres[]
+}
+
+model Rating {
+  id          Int     @id @default(autoincrement())
+  description String  @unique
+  Movie       Movie[]
+}
+
+model MoviesOnActors {
+  MoviesOnActorsId Int    @id @default(autoincrement())
+  cast             Actor  @relation(fields: [castId], references: [id])
+  castId           String
+  movie            Movie  @relation(fields: [movieId], references: [id])
+  movieId          String
+}
+
+model Actor {
+  id             String           @id @default(uuid())
+  name           String
+  birthday       DateTime
+  MoviesOnActors MoviesOnActors[]
+  gender         Gender           @relation(fields: [genderId], references: [id])
+  genderId       Int
+}
+
+model Gender {
+  id    Int     @id @default(autoincrement())
+  type  String  @unique
+  Actor Actor[]
+}
+
+model Occupation {
+  id      Int     @id @default(autoincrement())
+  name    String  @unique
+  Staff   Staff?  @relation(fields: [staffId], references: [id])
+  staffId String?
+}
+
+model Staff {
+  id             String           @id @default(uuid())
+  name           String
+  occupation     Occupation[]
+  MoviesOnStaffs MoviesOnStaffs[]
+}
+
+model MoviesOnStaffs {
+  id      Int    @id @default(autoincrement())
+  movie   Movie  @relation(fields: [movieId], references: [id])
+  movieId String
+  staff   Staff  @relation(fields: [staffId], references: [id])
+  staffId String
+}
+
+model CompanyType {
+  id      Int       @id @default(autoincrement())
+  type    String    @unique
+  Company Company[]
+}
+
+model Company {
+  id                String              @id @default(uuid())
+  name              String
+  type              CompanyType         @relation(fields: [typeId], references: [id])
+  typeId            Int
+  MoviesOnCompanies MoviesOnCompanies[]
+}
+
+model MoviesOnCompanies {
+  id        Int     @id @default(autoincrement())
+  movie     Movie   @relation(fields: [movieId], references: [id])
+  movieId   String
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String
+}
+
+model OfficialSite {
+  id      String @id @default(uuid())
+  movie   Movie  @relation(fields: [movieId], references: [id])
+  movieId String
+  link    String @unique
+}
+
+model Genre {
+  id             Int              @id @default(autoincrement())
+  name           String           @unique
+  MoviesOnGenres MoviesOnGenres[]
+}
+
+model MoviesOnGenres {
+  id      Int    @id @default(autoincrement())
+  movie   Movie  @relation(fields: [movieId], references: [id])
+  movieId String
+  genre   Genre  @relation(fields: [genreId], references: [id])
+  genreId Int
+}
