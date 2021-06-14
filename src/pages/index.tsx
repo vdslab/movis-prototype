@@ -75,7 +75,7 @@ const Home: React.VFC = () => {
                     <div className="columns" key={i}>
                       {array.map((actor) => {
                         return (
-                          <Link href={`/movie/${actor.id}`} key={actor.id}>
+                          <Link href={`/network/${actor.id}`} key={actor.id}>
                             <a className="column is-3">
                               <ActorCard name={actor.name} id={actor.id} />
                             </a>
