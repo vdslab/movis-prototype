@@ -1,12 +1,10 @@
 import { Actor } from "@prisma/client";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/router";
 import Link from "next/link";
 import ActorCard from "~/components/actorCard";
 import Layout from "~/components/layout";
 
 const Home: React.VFC = () => {
-  const router = useRouter();
   const [input, setInput] = useState({ name: "" });
   const [actors, setActors] = useState<Actor[]>([]);
 
@@ -70,7 +68,6 @@ const Home: React.VFC = () => {
                   []
                 )
                 .map((array, i) => {
-                  console.log(array);
                   return (
                     <div className="columns" key={i}>
                       {array.map((actor) => {
