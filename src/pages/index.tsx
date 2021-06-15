@@ -111,8 +111,8 @@ const Home: React.VFC<ServerSideProps> = ({ query: { page, name } }) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const name = context.query.name ? context.query.name : "";
-  const page = context.query.page ? context.query.page : 1;
+  const name = context.query.name ? String(context.query.name) : "";
+  const page = context.query.page ? String(context.query.page) : "1";
   return {
     props: {
       query: {
