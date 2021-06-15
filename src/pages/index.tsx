@@ -1,7 +1,7 @@
 import { Actor } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import ActorCard from "~/components/actorCard";
+import ActorCard from "~/components/actor-card";
 import Layout from "~/components/layout";
 
 const Home: React.VFC = () => {
