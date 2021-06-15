@@ -14,7 +14,6 @@ interface ServerSideProps {
 }
 
 const Home: React.VFC<ServerSideProps> = ({ query: { page, name } }) => {
-  const router = useRouter();
   const [input, setInput] = useState({ name });
   const [actors, setActors] = useState<Actor[]>([]);
 
@@ -34,6 +33,7 @@ const Home: React.VFC<ServerSideProps> = ({ query: { page, name } }) => {
       if (name) {
         params.set("name", name);
       }
+
       const res = await fetch(`/api/actors?${params.toString()}`);
       const data: Actor[] = await res.json();
 
