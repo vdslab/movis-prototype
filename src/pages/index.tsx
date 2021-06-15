@@ -1,16 +1,24 @@
 import { Actor } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import ActorCard from "~/components/actor-card";
 import Layout from "~/components/layout";
+import { GetServerSideProps } from "next";
 
-const Home: React.VFC = () => {
-  const [input, setInput] = useState({ name: "" });
+interface ServerSideProps {
+  query: {
+    page?: string;
+    name?: string;
+  };
+}
+
+const Home: React.VFC<ServerSideProps> = ({ query: { page, name } }) => {
+  const router = useRouter();
+  const [input, setInput] = useState({ name });
   const [actors, setActors] = useState<Actor[]>([]);
 
   const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-
     setInput((prev) => {
       return {
         ...prev,
@@ -22,14 +30,16 @@ const Home: React.VFC = () => {
   useEffect(() => {
     (async () => {
       const params = new URLSearchParams();
-      params.set("page", "0");
+      params.set("page", "1");
+      if (name) {
+        params.set("name", name);
+      }
       const res = await fetch(`/api/actors?${params.toString()}`);
       const data: Actor[] = await res.json();
-      console.log(data);
 
       setActors(data);
     })();
-  }, []);
+  }, [name, page]);
 
   return (
     <Layout>
@@ -50,7 +60,17 @@ const Home: React.VFC = () => {
                     />
                   </div>
                   <div className="control">
-                    <button className="button is-link">検索</button>
+                    <Link
+                      href={{
+                        pathname: "/",
+                        query: {
+                          name: input.name,
+                          page,
+                        },
+                      }}
+                    >
+                      <button className="button is-link">検索</button>
+                    </Link>
                   </div>
                 </div>
               </form>
@@ -88,6 +108,19 @@ const Home: React.VFC = () => {
       </section>
     </Layout>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const name = context.query.name ? context.query.name : "";
+  const page = context.query.page ? context.query.page : 1;
+  return {
+    props: {
+      query: {
+        name,
+        page,
+      },
+    },
+  };
 };
 
 export default Home;
