@@ -15,7 +15,7 @@ model Movie {
   title        String
   releaseDate  DateTime
   runtime      Int? /// minutes
-  story        String
+  story        String?
   OfficialSite OfficialSite?
   Staff        Staff[]
   Actor        Actor[]
