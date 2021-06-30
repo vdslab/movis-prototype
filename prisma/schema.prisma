@@ -13,7 +13,7 @@ generator client {
 model Movie {
   id           String        @id @default(uuid())
   title        String
-  releaseDate  DateTime
+  releaseDate  DateTime?
   runtime      Int? /// minutes
   story        String?
   OfficialSite OfficialSite?
