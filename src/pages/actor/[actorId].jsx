@@ -1,6 +1,6 @@
 import React from "react";
 
-const ActorDetails: React.VFC = () => {
+const ActorDetails = () => {
   return <h1 className="title">ActorDetails</h1>;
 };
 
