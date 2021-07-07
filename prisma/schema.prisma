@@ -38,6 +38,7 @@ model Occupation {
 
 model Staff {
   id         String       @id @default(uuid())
+  jfdbId     String?      @unique
   name       String
   Occupation Occupation[]
   Movie      Movie[]
@@ -53,7 +54,7 @@ model OfficialSite {
   id      String @id @default(uuid())
   movie   Movie  @relation(fields: [movieId], references: [id])
   movieId String
-  link    String
+  url     String
 }
 
 model Category {
