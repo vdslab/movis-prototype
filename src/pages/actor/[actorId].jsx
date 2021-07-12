@@ -1,160 +1,116 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "~/components/layout";
+import Network from "~/components/network";
+import { TMDB_API_KEY } from "~/env/tmdb";
+import MovieCard from "~/components/movie-card";
+import Link from "next/link";
 import Image from "next/image";
 import "bulma/css/bulma.css";
-import Link from "next/link";
 
-const ActorDetails = () => {
+const apiBaseUrl = "https://api.themoviedb.org/3/search/person";
+const imgBaseUrl = "https://image.tmdb.org/t/p/w500";
+
+const ActorDetails = ({ query: { actorId } }) => {
+  const [data, setData] = useState(null);
+  const [movies, setMovies] = useState([]);
+  const [imageSrc, setImageSrc] = useState("/noImage.jpeg");
+
+  useEffect(() => {
+    if (!data) {
+      return;
+    }
+    console.log(data);
+    const getTmdbData = async (name) => {
+      const params = new URLSearchParams();
+      params.set("api_key", TMDB_API_KEY);
+      params.set("language", "ja-JP");
+      params.set("query", name);
+      params.set("page", "1");
+      params.set("include_adult", "false");
+      params.set("region", "JP");
+
+      const res = await fetch(`${apiBaseUrl}?${params.toString()}`);
+      const data = await res.json();
+
+      if (data.results.length !== 0 && data.results[0].profile_path !== null) {
+        setImageSrc(`${imgBaseUrl}${data.results[0].profile_path}`);
+      }
+    };
+    getTmdbData(data.name);
+  }, [data]);
+
+  useEffect(() => {
+    (async () => {
+      const res = await fetch(`/api/actor/${actorId}/relation`);
+      const data = await res.json();
+
+      setData(data);
+      setMovies(data.Movie);
+    })();
+  }, []);
+
   return (
     <Layout>
-      <main>
-        <div className="columns margin-top mt-6">
-          <div className="column margin-left ml-5">
-            <Image width="340px" height="510px" src={"/noImage.jpeg"} />
-            <h1 className="title">
-              <u>森菜々</u>
-            </h1>
-            <p>・女性</p>
+      {data && (
+        <main>
+          <div className="columns margin-top mt-6">
+            <div className="column margin-left ml-5">
+              {/* <Image width="340px" height="510px" src={"/noImage.jpeg"} /> */}
+              <img width="622px" height="933px" src={imageSrc} />
+              <h1 className="title">
+                {/* <u>森菜々</u> */}
+                <u>{data.name}</u>
+              </h1>
+              {/* <p>・女性</p>
             <p>・2001年8月31日生まれ</p>
             <p>・デビュー曲となる主題歌「カエルノウタ」を</p>
-            <p>　2020年1月15日にリリースする。</p>
-          </div>
-          <div className="column is-two-thirds has-background-danger">
-            <div className="Box "></div>
-          </div>
-        </div>
-
-        <div className="container"></div>
-        <section className="section">
-          <div className="columns">
-            <div className="column">
-              <div className="Box">
-                <div className="columns">
-                  <Link href="/movie/movieId">
-                    <a className="column is-3">
-                      <div className="card">
-                        <div className="card-image">
-                          <Image
-                            width="622px"
-                            height="933px"
-                            src="/noImage.jpeg"
-                          />
-                        </div>
-                        <div className="card-content">
-                          <div className="content">
-                            <p>天気の子</p>
-                          </div>
-                        </div>
-                      </div>
-                    </a>
-                  </Link>
-                  <a className="column is-3">
-                    <div className="card">
-                      <div className="card-image">
-                        <Image
-                          width="622px"
-                          height="933px"
-                          src="/noImage.jpeg"
-                        />
-                      </div>
-                      <div className="card-content">
-                        <div className="content">
-                          <p>東京喰種</p>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                  <a className="column is-3">
-                    <div className="card">
-                      <div className="card-image">
-                        <Image
-                          width="622px"
-                          height="933px"
-                          src="/noImage.jpeg"
-                        />
-                      </div>
-                      <div className="card-content">
-                        <div className="content">
-                          <p>地獄少女</p>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                  <a className="column is-3">
-                    <div className="card">
-                      <div className="card-image">
-                        <Image
-                          width="622px"
-                          height="933px"
-                          src="/noImage.jpeg"
-                        />
-                      </div>
-                      <div className="card-content">
-                        <div className="content">
-                          <p>青くて痛くて脆い</p>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-
-                <div className="columns">
-                  <a className="column is-3">
-                    <div className="card">
-                      <div className="card-image">
-                        <Image
-                          width="622px"
-                          height="933px"
-                          src="/noImage.jpeg"
-                        />
-                      </div>
-                      <div className="card-content">
-                        <div className="content">
-                          <p>天気の子</p>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                  <a className="column is-3">
-                    <div className="card">
-                      <div className="card-image">
-                        <Image
-                          width="622px"
-                          height="933px"
-                          src="/noImage.jpeg"
-                        />
-                      </div>
-                      <div className="card-content">
-                        <div className="content">
-                          <p>東京喰種</p>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                  <a className="column is-3">
-                    <div className="card">
-                      <div className="card-image">
-                        <Image
-                          width="622px"
-                          height="933px"
-                          src="/noImage.jpeg"
-                        />
-                      </div>
-                      <div className="card-content">
-                        <div className="content">
-                          <p>地獄少女</p>
-                        </div>
-                      </div>
-                    </div>
-                  </a>
-                </div>
-              </div>
+            <p>　2020年1月15日にリリースする。</p> */}
+            </div>
+            <div className="column is-two-thirds has-background-danger">
+              <Network />
             </div>
           </div>
-        </section>
-      </main>
+
+          <div className="container"></div>
+          <section className="section">
+            {movies
+              .reduce(
+                (a, c, i) =>
+                  i % 4 == 0
+                    ? [...a, [c]]
+                    : [...a.slice(0, -1), [...a[a.length - 1], c]],
+                []
+              )
+              .map((array, i) => {
+                return (
+                  <div className="columns" key={i}>
+                    {array.map((movie) => {
+                      return (
+                        <Link href={`/movie/${movie.id}`} key={movie.id}>
+                          <a className="column is-3">
+                            <MovieCard name={movie.title} id={movie.id} />
+                          </a>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+          </section>
+        </main>
+      )}
     </Layout>
   );
+};
+
+export const getServerSideProps = (ctx) => {
+  return {
+    props: {
+      query: {
+        actorId: ctx.query.actorId,
+      },
+    },
+  };
 };
 
 export default ActorDetails;

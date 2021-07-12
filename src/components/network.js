@@ -209,7 +209,7 @@ export default function Graph() {
         const nodes = Array();
         const links = Array();
         const select = selected.slice(-1)[0].id;
-        console.log(select);
+        // console.log(select);
         const selectdepth_1 = [select];
         for (const item of data.links) {
           if (select === item.source) {
