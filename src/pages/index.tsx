@@ -92,7 +92,7 @@ const Home: React.VFC<ServerSideProps> = ({ query: { page, name } }) => {
                     <div className="columns" key={i}>
                       {array.map((actor) => {
                         return (
-                          <Link href={`/network/${actor.id}`} key={actor.id}>
+                          <Link href={`/actor/${actor.id}`} key={actor.id}>
                             <a className="column is-3">
                               <ActorCard name={actor.name} id={actor.id} />
                             </a>
