@@ -6,7 +6,7 @@
 import * as d3 from "d3";
 import { useEffect, useState } from "react";
 export default function Graph() {
-  const [selected, setSerected] = useState({ id: "Null" }); //データだけ入る段階。
+  const [selected, setSelected] = useState({ id: "Null" }); //データだけ入る段階。
   const [nodes, setNodes] = useState([]); //useEffect内でselectedが更新されるごとにデータも更新していく
   const [links, setLinks] = useState([]);
   const width = 1000;
@@ -14,9 +14,9 @@ export default function Graph() {
 
   const nodeHighlight = (node) => {
     if (selected.id === node.id) {
-      setSerected({ id: "Null" });
+      setSelected({ id: "Null" });
     } else {
-      setSerected({ id: `${node.id}` });
+      setSelected({ id: `${node.id}` });
     }
   };
 
@@ -288,7 +288,7 @@ export default function Graph() {
                   cx={node.x}
                   cy={node.y}
                   onClick={() => nodeHighlight(node)}
-                  fill={node.color}
+                  fill={selected.id === node.id ? "black" : "silver"}
                 />
                 <text fill="black" x={node.x + 10} y={node.y + 5}>
                   {node.id}
