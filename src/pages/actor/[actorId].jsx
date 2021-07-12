@@ -12,6 +12,7 @@ const imgBaseUrl = "https://image.tmdb.org/t/p/w500";
 
 const ActorDetails = ({ query: { actorId } }) => {
   const [data, setData] = useState(null);
+  const [selected, setSelected] = useState([]);
   const [movies, setMovies] = useState([]);
   const [imageSrc, setImageSrc] = useState("/noImage.jpeg");
   const nodes = [];
@@ -48,6 +49,20 @@ const ActorDetails = ({ query: { actorId } }) => {
       }
     }
   }
+
+  const handleSelect = (node) => {
+    const nodeId = node.id;
+    setSelected((prev) => {
+      const index = prev.indexOf(nodeId);
+      const selectedNodeIds = [...prev];
+      if (index < 0) {
+        selectedNodeIds.push(nodeId);
+      } else {
+        selectedNodeIds.splice(index, 1);
+      }
+      return selectedNodeIds;
+    });
+  };
 
   useEffect(() => {
     if (!data) {
@@ -100,8 +115,12 @@ const ActorDetails = ({ query: { actorId } }) => {
             <p>・デビュー曲となる主題歌「カエルノウタ」を</p>
             <p>　2020年1月15日にリリースする。</p> */}
             </div>
-            <div className="column is-two-thirds has-background-danger">
-              <Network initialNetwork={{ nodes, links }} />
+            <div className="column is-two-thirds has-background-warning">
+              <Network
+                initialNetwork={{ nodes, links }}
+                selected={selected}
+                handleSelect={handleSelect}
+              />
             </div>
           </div>
 

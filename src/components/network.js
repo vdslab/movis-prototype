@@ -5,8 +5,7 @@
 // ネットワークに必要な情報自体の要素が何になるのかをなるはやで選定
 import * as d3 from "d3";
 import { useEffect, useState } from "react";
-export default function Graph() {
-  const [selected, setSelected] = useState([]); //データだけ入る段階。
+export default function Graph({ initialNetwork, selected, handleSelect }) {
   const [highlightnode, setHighlightnode] = useState([]);
   const [highlightlink, setHighlightlink] = useState([]);
   const [nodes, setNodes] = useState([]); //useEffect内でselectedが更新されるごとにデータも更新していく
@@ -103,51 +102,21 @@ export default function Graph() {
     };
     const startLineChart = async () => {
       const [nodes, links] = await (async () => {
-       
         const data = initialNetwork;
         const nodes = Array();
         const links = Array();
-        const select = selected.id;
-        console.log(select);
-        const selectdepth_1 = [select];
-        for (const item of data.links) {
-          if (select === item.source) {
-            selectdepth_1.push(item.target);
-          }
-          if (select === item.target) {
-            selectdepth_1.push(item.source);
-          }
-        }
 
         for (const item of data.nodes) {
-          if (selectdepth_1.includes(item.id)) {
-            nodes.push({
-              id: item.id,
-              color: "black",
-              name: item.name,
-            });
-          } else {
-            nodes.push({
-              id: item.id,
-              color: "silver",
-              name: item.name,
-            });
-          }
+          nodes.push({
+            id: item.id,
+            name: item.name,
+          });
         }
         for (const item of data.links) {
-          if (select === item.source || select === item.target) {
-            links.push({
-              source: item.source,
-              target: item.target,
-              color: "black",
-            });
-          } else {
-            links.push({
-              source: item.source,
-              target: item.target,
-              color: "silver",
-            });
-          }
+          links.push({
+            source: item.source,
+            target: item.target,
+          });
         }
         return [nodes, links];
       })();
@@ -162,6 +131,8 @@ export default function Graph() {
       <g>
         <g>
           {links.map((link, i) => {
+            const target = link.target.id;
+            const source = link.source.id;
             return (
               <g key={i}>
                 <line
@@ -170,7 +141,7 @@ export default function Graph() {
                   x2={link.source.x}
                   y2={link.source.y}
                   strokeWidth="1"
-                  stroke={link.color}
+                  stroke={"silver"}
                 />
               </g>
             );
@@ -184,7 +155,7 @@ export default function Graph() {
                   r="10"
                   cx={node.x}
                   cy={node.y}
-                  onClick={() => nodeHighlight(node)}
+                  onClick={() => handleSelect(node)}
                   fill={selected.includes(node.id) ? "black" : "silver"}
                   // highlightnode.includes(node.id) ? "black" : "silver"
                 />

@@ -10,7 +10,7 @@ const Navbar: React.VFC = () => {
       <div className="navbar-brand">
         <Link href="/">
           <a className="navbar-item">
-            <h1 className="title">Movis</h1>
+            <h1 className="title">movis</h1>
           </a>
         </Link>
       </div>
