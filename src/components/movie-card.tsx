@@ -21,6 +21,9 @@ const MovieCard: React.VFC<ActorCardProps> = ({ name, id }) => {
       params.set("include_adult", "false");
       params.set("region", "JP");
 
+      if (id === "259f8726-cd6e-4f00-9bf0-adfab998dd21") {
+        console.log("hello");
+      }
       const res = await fetch(`${apiBaseUrl}?${params.toString()}`);
       const data = await res.json();
 

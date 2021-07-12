@@ -64,6 +64,23 @@ const ActorDetails = ({ query: { actorId } }) => {
     });
   };
 
+  // useEffect(() => {
+  //   if (selected.length === 0) {
+  //     setMovies(data.Movie);
+  //     return;
+  //   }
+  //   const newMovies = [];
+  //   for (const movie of data.Movie) {
+  //     for (const actor of movie.Actor) {
+  //       if (selected.includes(actor.id)) {
+  //         newMovies.push(movie);
+  //         break;
+  //       }
+  //     }
+  //   }
+  //   setMovies(newMovies);
+  // }, [selected]);
+
   useEffect(() => {
     if (!data) {
       return;
@@ -127,6 +144,16 @@ const ActorDetails = ({ query: { actorId } }) => {
           <div className="container"></div>
           <section className="section">
             {movies
+              .filter((movie) => {
+                if (selected.length === 0) {
+                  return true;
+                }
+                for (const actor of movie.Actor) {
+                  if (selected.includes(actor.id)) {
+                    return true;
+                  }
+                }
+              })
               .reduce(
                 (a, c, i) =>
                   i % 4 == 0
