@@ -24,7 +24,7 @@ const MovieCard: React.VFC<ActorCardProps> = ({ name, id }) => {
       const res = await fetch(`${apiBaseUrl}?${params.toString()}`);
       const data = await res.json();
 
-      if (data.results.length !== 0 && data.results[0].poster_path !== null) {
+      if (data.results?.length !== 0 && data.results[0].poster_path !== null) {
         setImageSrc(`${imgBaseUrl}${data.results[0].poster_path}`);
       }
     })();
