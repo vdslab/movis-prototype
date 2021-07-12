@@ -6,7 +6,7 @@
 import * as d3 from "d3";
 import { useEffect, useState } from "react";
 export default function Graph() {
-  const [selected, setSelected] = useState({ id: "Null" }); //データだけ入る段階。
+  const [selected, setSelected] = useState([]); //データだけ入る段階。
   const [highlightnode, setHighlightnode] = useState([]);
   const [highlightlink, setHighlightlink] = useState([]);
   const [nodes, setNodes] = useState([]); //useEffect内でselectedが更新されるごとにデータも更新していく
@@ -15,11 +15,17 @@ export default function Graph() {
   const height = 1000;
 
   const nodeHighlight = (node) => {
-    if (selected.id === node.id) {
-      setSelected({ id: "Null" });
-    } else {
-      setSelected({ id: `${node.id}` });
-    }
+    const nodeId = node.id;
+    setSelected((prev) => {
+      const index = prev.indexOf(nodeId);
+      const selectedNodeIds = [...prev];
+      if (index < 0) {
+        selectedNodeIds.push(nodeId);
+      } else {
+        selectedNodeIds.splice(index, 1);
+      }
+      return selectedNodeIds;
+    });
     // console.log(selected);
     // const selectdepthnode_1 = [];
     // for (const item of links.id) {
@@ -317,7 +323,7 @@ export default function Graph() {
                   cx={node.x}
                   cy={node.y}
                   onClick={() => nodeHighlight(node)}
-                  fill={selected.id === node.id ? "black" : "silver"}
+                  fill={selected.includes(node.id) ? "black" : "silver"}
                   // highlightnode.includes(node.id) ? "black" : "silver"
                 />
                 <text fill="black" x={node.x + 10} y={node.y + 5}>
