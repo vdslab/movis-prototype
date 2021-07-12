@@ -14,6 +14,40 @@ const ActorDetails = ({ query: { actorId } }) => {
   const [data, setData] = useState(null);
   const [movies, setMovies] = useState([]);
   const [imageSrc, setImageSrc] = useState("/noImage.jpeg");
+  const nodes = [];
+  const links = [];
+  if (data) {
+    for (const movie of data.Movie) {
+      for (const actor of movie.Actor) {
+        if (!(actor.id in nodes) && data.id !== actor.id) {
+          nodes.push({ id: actor.id, name: actor.name });
+        }
+      }
+    }
+    const sourceTargetCount = {};
+    for (const movie of data.Movie) {
+      for (const actor of movie.Actor) {
+        if (data.id !== actor.id) {
+          sourceTargetCount[actor.id] = [];
+        }
+      }
+      const sorted = [...movie.Actor].sort();
+
+      sorted.forEach((from, index) => {
+        for (const to of sorted.slice(index + 1, sorted.length)) {
+          if (from.id !== to.id && from.id !== data.id && to.id !== data.id) {
+            sourceTargetCount[from.id].push(to.id);
+          }
+        }
+      });
+    }
+
+    for (const source in sourceTargetCount) {
+      for (const target of sourceTargetCount[source]) {
+        links.push({ source, target, weight: 1 });
+      }
+    }
+  }
 
   useEffect(() => {
     if (!data) {
@@ -67,7 +101,7 @@ const ActorDetails = ({ query: { actorId } }) => {
             <p>　2020年1月15日にリリースする。</p> */}
             </div>
             <div className="column is-two-thirds has-background-danger">
-              <Network />
+              <Network initialNetwork={{ nodes, links }} />
             </div>
           </div>
 
