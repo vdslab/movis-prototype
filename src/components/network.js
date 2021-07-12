@@ -7,6 +7,8 @@ import * as d3 from "d3";
 import { useEffect, useState } from "react";
 export default function Graph() {
   const [selected, setSelected] = useState({ id: "Null" }); //データだけ入る段階。
+  const [highlightnode, setHighlightnode] = useState([]);
+  const [highlightlink, setHighlightlink] = useState([]);
   const [nodes, setNodes] = useState([]); //useEffect内でselectedが更新されるごとにデータも更新していく
   const [links, setLinks] = useState([]);
   const width = 1000;
@@ -18,6 +20,33 @@ export default function Graph() {
     } else {
       setSelected({ id: `${node.id}` });
     }
+    // console.log(selected);
+    // const selectdepthnode_1 = [];
+    // for (const item of links.id) {
+    //   if (selected.id === item.source) {
+    //     selectdepthnode_1.push(item.target);
+    //   // }
+    //   if (selected.id === item.target) {
+    //     selectdepthnode_1.push(item.source);
+    //   }
+    // }
+    // setHighlightnode(selectdepthnode_1);
+    // const selectdepthlink_1 = [];
+    // for (const item of links.id) {
+    //   if (selected.id === item.source || selected.id === item.target) {
+    //     links.push({
+    //       source: item.source,
+    //       target: item.target,
+    //       color: "black",
+    //     });
+    //   } else {
+    //     links.push({
+    //       source: item.source,
+    //       target: item.target,
+    //       color: "silver",
+    //     });
+    //   }
+    // }
   };
 
   useEffect(() => {
@@ -289,6 +318,7 @@ export default function Graph() {
                   cy={node.y}
                   onClick={() => nodeHighlight(node)}
                   fill={selected.id === node.id ? "black" : "silver"}
+                  // highlightnode.includes(node.id) ? "black" : "silver"
                 />
                 <text fill="black" x={node.x + 10} y={node.y + 5}>
                   {node.id}
