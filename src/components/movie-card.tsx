@@ -6,10 +6,10 @@ interface ActorCardProps {
   id: string;
 }
 
-const apiBaseUrl = "https://api.themoviedb.org/3/search/person";
+const apiBaseUrl = "https://api.themoviedb.org/3/search/movie";
 const imgBaseUrl = "https://image.tmdb.org/t/p/w500";
 
-const ActorCard: React.VFC<ActorCardProps> = ({ name, id }) => {
+const MovieCard: React.VFC<ActorCardProps> = ({ name, id }) => {
   const [imageSrc, setImageSrc] = useState("/noImage.jpeg");
   useEffect(() => {
     (async () => {
@@ -26,10 +26,10 @@ const ActorCard: React.VFC<ActorCardProps> = ({ name, id }) => {
 
       if (
         data.results &&
-        data.results.length !== 0 &&
-        data.results[0].profile_path !== null
+        data.results?.length !== 0 &&
+        data.results[0].poster_path !== null
       ) {
-        setImageSrc(`${imgBaseUrl}${data.results[0].profile_path}`);
+        setImageSrc(`${imgBaseUrl}${data.results[0].poster_path}`);
       }
     })();
   }, []);
@@ -50,4 +50,4 @@ const ActorCard: React.VFC<ActorCardProps> = ({ name, id }) => {
   );
 };
 
-export default ActorCard;
+export default MovieCard;
