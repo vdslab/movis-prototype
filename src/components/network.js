@@ -10,8 +10,13 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
   const [highlightlink, setHighlightlink] = useState([]);
   const [nodes, setNodes] = useState([]); //useEffect内でselectedが更新されるごとにデータも更新していく
   const [links, setLinks] = useState([]);
-  const width = 1000;
-  const height = 1000;
+  const halfwidth = 400; //スマホの横画面の横の長さを考慮した値。ここは固定値ではない
+  const width =
+    window.innerWidth < halfwidth
+      ? window.innerWidth * 0.9
+      : window.innerWidth * 0.46;
+  const height = window.innerHeight;
+  console.log(width, height);
 
   const nodeHighlight = (node) => {
     const nodeId = node.id;
@@ -73,24 +78,24 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
           "link",
           d3
             .forceLink()
-            .distance((d) => 30)
+            .distance((d) => 10)
             .id((d) => d.id)
         )
         .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("charge", d3.forceManyBody().strength(-300))
+        .force("charge", d3.forceManyBody().strength(-1000))
         .force(
           "x",
           d3
             .forceX()
             .x(width / 2)
-            .strength(0.05)
+            .strength(0.9)
         )
         .force(
           "y",
           d3
             .forceY()
             .y(height / 2)
-            .strength(0.05)
+            .strength(0.9)
         );
       simulation.nodes(nodes).on("tick", ticked);
       simulation.force("link").links(links);
@@ -127,7 +132,12 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
   }, []); //最初とselectedが更新された時だけこれを実行するためのEffect　選択されたらデータも更新してその都度シュミレーションを行うことにしている。ハイライトの際はいらないのでmouseOverの時だけにするとか？
 
   return (
-    <svg className="graph" width="1000" height="1000">
+    <svg
+      className="graph"
+      width={`${width}`}
+      height={`${height}`}
+      viewBox={`0 0 ${width} ${height}`}
+    >
       <g>
         <g>
           {links.map((link, i) => {
