@@ -6,14 +6,18 @@
 import * as d3 from "d3";
 import { useEffect, useState } from "react";
 export default function Graph() {
-  const [selected, setSerected] = useState([{ id: "Null" }]); //データだけ入る段階。
+  const [selected, setSerected] = useState({ id: "Null" }); //データだけ入る段階。
   const [nodes, setNodes] = useState([]); //useEffect内でselectedが更新されるごとにデータも更新していく
   const [links, setLinks] = useState([]);
   const width = 1000;
   const height = 1000;
 
   const nodeHighlight = (node) => {
-    setSerected([...selected, node]);
+    if (selected.id === node.id) {
+      setSerected({ id: "Null" });
+    } else {
+      setSerected({ id: `${node.id}` });
+    }
   };
 
   useEffect(() => {
@@ -208,7 +212,7 @@ export default function Graph() {
         };
         const nodes = Array();
         const links = Array();
-        const select = selected.slice(-1)[0].id;
+        const select = selected.id;
         console.log(select);
         const selectdepth_1 = [select];
         for (const item of data.links) {
@@ -254,7 +258,7 @@ export default function Graph() {
     };
 
     startLineChart();
-  }, [selected]); //最初とselectedが更新された時だけこれを実行するためのEffect　選択されたらデータも更新してその都度シュミレーションを行うことにしている。ハイライトの際はいらないのでmouseOverの時だけにするとか？
+  }, []); //最初とselectedが更新された時だけこれを実行するためのEffect　選択されたらデータも更新してその都度シュミレーションを行うことにしている。ハイライトの際はいらないのでmouseOverの時だけにするとか？
 
   return (
     <svg className="graph" width="1000" height="1000">
