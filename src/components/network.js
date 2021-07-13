@@ -4,18 +4,21 @@
 // データだけ更新の処理
 // ネットワークに必要な情報自体の要素が何になるのかをなるはやで選定
 import * as d3 from "d3";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 export default function Graph({ initialNetwork, selected, handleSelect }) {
   const [highlightnode, setHighlightnode] = useState([]);
   const [highlightlink, setHighlightlink] = useState([]);
   const [nodes, setNodes] = useState([]); //useEffect内でselectedが更新されるごとにデータも更新していく
   const [links, setLinks] = useState([]);
-  const halfwidth = 400; //スマホの横画面の横の長さを考慮した値。ここは固定値ではない
-  const width =
-    window.innerWidth < halfwidth
-      ? window.innerWidth * 0.9
-      : window.innerWidth * 0.46;
-  const height = window.innerHeight;
+  // const width =
+  //   window.innerWidth < halfwidth
+  //     ? window.innerWidth * 0.9
+  //     : window.innerWidth * 0.46;
+  // const height = window.innerHeight;
+
+  const wrapperRef = useRef();
+  const [size, setSize] = useState({ width: 0, height: 0 }); //初期値の値でシミュレーションし終わった後にwindowのはばを取ってるからグラフが真ん中に来ないのとheightの値が更新されてレンダリングされている理由がわからない。
+  const { width, height } = size;
   console.log(width, height);
 
   const nodeHighlight = (node) => {
@@ -60,6 +63,19 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
   };
 
   useEffect(() => {
+    const observer = new ResizeObserver((entries) => {
+      if (wrapperRef.current) {
+        const { clientWidth, clientHeight } = wrapperRef.current;
+        setSize({ width: clientWidth, height: clientHeight });
+      }
+    });
+    observer.observe(wrapperRef.current);
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
     const firstSimuration = (nodes, links) => {
       //ここ参照https://wizardace.com/d3-forcesimulation-onlynode/
       //やっぱここの値おおきくしないとまとまんねえ
@@ -82,7 +98,7 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
             .id((d) => d.id)
         )
         .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("charge", d3.forceManyBody().strength(-1000))
+        .force("charge", d3.forceManyBody().strength(-1000)) //縮小していいかどうか全体を描画してから縮小一番上のノードと一番下のノードの高さ（横も叱り）の絶対値から全体の描画の大きさがわかる
         .force(
           "x",
           d3
@@ -97,30 +113,32 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
             .y(height / 2)
             .strength(0.9)
         );
-      simulation.nodes(nodes).on("tick", ticked);
-      simulation.force("link").links(links);
 
-      function ticked() {
-        setNodes(nodes.slice()); //何で必要か？？
-        setLinks(links.slice());
-      }
+      simulation.nodes(nodes);
+      simulation.force("link").links(links);
+      simulation.tick(500).stop();
+      setNodes(nodes.slice()); //何で必要か？？
+      setLinks(links.slice());
     };
     const startLineChart = async () => {
       const [nodes, links] = await (async () => {
         const data = initialNetwork;
         const nodes = Array();
         const links = Array();
+        const r = 10;
 
         for (const item of data.nodes) {
           nodes.push({
             id: item.id,
             name: item.name,
+            r,
           });
         }
         for (const item of data.links) {
           links.push({
             source: item.source,
             target: item.target,
+            r,
           });
         }
         return [nodes, links];
@@ -132,52 +150,54 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
   }, []); //最初とselectedが更新された時だけこれを実行するためのEffect　選択されたらデータも更新してその都度シュミレーションを行うことにしている。ハイライトの際はいらないのでmouseOverの時だけにするとか？
 
   return (
-    <svg
-      className="graph"
-      width={`${width}`}
-      height={`${height}`}
-      viewBox={`0 0 ${width} ${height}`}
-    >
-      <g>
+    <div ref={wrapperRef}>
+      <svg
+        className="graph"
+        width={`${width}`}
+        height={`${height}`}
+        viewBox={`0 0 ${width} ${height}`}
+      >
         <g>
-          {links.map((link, i) => {
-            const target = link.target.id;
-            const source = link.source.id;
-            return (
-              <g key={i}>
-                <line
-                  x1={link.target.x}
-                  y1={link.target.y}
-                  x2={link.source.x}
-                  y2={link.source.y}
-                  strokeWidth="1"
-                  stroke={"silver"}
-                />
-              </g>
-            );
-          })}
+          <g>
+            {links.map((link, i) => {
+              const target = link.target.id;
+              const source = link.source.id;
+              return (
+                <g key={i}>
+                  <line
+                    x1={link.target.x}
+                    y1={link.target.y}
+                    x2={link.source.x}
+                    y2={link.source.y}
+                    strokeWidth="1"
+                    stroke={"silver"}
+                  />
+                </g>
+              );
+            })}
+          </g>
+          <g>
+            {nodes.map((node, i) => {
+              return (
+                <g key={i}>
+                  <circle
+                    r="10"
+                    cx={node.x}
+                    cy={node.y}
+                    onClick={() => handleSelect(node)}
+                    fill={selected.includes(node.id) ? "black" : "silver"}
+                    // highlightnode.includes(node.id) ? "black" : "silver"
+                  />
+                  <text fill="black" x={node.x + 10} y={node.y + 5}>
+                    {node.name}
+                  </text>
+                </g>
+              );
+            })}
+          </g>
         </g>
-        <g>
-          {nodes.map((node, i) => {
-            return (
-              <g key={i}>
-                <circle
-                  r="10"
-                  cx={node.x}
-                  cy={node.y}
-                  onClick={() => handleSelect(node)}
-                  fill={selected.includes(node.id) ? "black" : "silver"}
-                  // highlightnode.includes(node.id) ? "black" : "silver"
-                />
-                <text fill="black" x={node.x + 10} y={node.y + 5}>
-                  {node.name}
-                </text>
-              </g>
-            );
-          })}
-        </g>
-      </g>
-    </svg>
+      </svg>
+    </div>
   );
 }
 // [...ssa]フーガが言ってた奴のはず */}
