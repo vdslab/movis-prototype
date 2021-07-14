@@ -132,51 +132,54 @@ const ActorDetails = ({ query: { actorId } }) => {
             <p>・デビュー曲となる主題歌「カエルノウタ」を</p>
             <p>　2020年1月15日にリリースする。</p> */}
             </div>
-            <div className="column is-two-thirds has-background-warning">
+          </div>
+
+          <div className="columns">
+            <div className="column is-7 has-background-warning">
               <Network
                 initialNetwork={{ nodes, links }}
                 selected={selected}
                 handleSelect={handleSelect}
               />
             </div>
+            <div className="column">
+              <section className="section">
+                {movies
+                  .filter((movie) => {
+                    if (selected.length === 0) {
+                      return true;
+                    }
+                    for (const actor of movie.Actor) {
+                      if (selected.includes(actor.id)) {
+                        return true;
+                      }
+                    }
+                  })
+                  .reduce(
+                    (a, c, i) =>
+                      i % 2 == 0
+                        ? [...a, [c]]
+                        : [...a.slice(0, -1), [...a[a.length - 1], c]],
+                    []
+                  )
+                  .map((array, i) => {
+                    return (
+                      <div className="columns" key={i}>
+                        {array.map((movie) => {
+                          return (
+                            <Link href={`/movie/${movie.id}`} key={movie.id}>
+                              <a className="column is-6">
+                                <MovieCard name={movie.title} id={movie.id} />
+                              </a>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
+              </section>
+            </div>
           </div>
-
-          <div className="container"></div>
-          <section className="section">
-            {movies
-              .filter((movie) => {
-                if (selected.length === 0) {
-                  return true;
-                }
-                for (const actor of movie.Actor) {
-                  if (selected.includes(actor.id)) {
-                    return true;
-                  }
-                }
-              })
-              .reduce(
-                (a, c, i) =>
-                  i % 4 == 0
-                    ? [...a, [c]]
-                    : [...a.slice(0, -1), [...a[a.length - 1], c]],
-                []
-              )
-              .map((array, i) => {
-                return (
-                  <div className="columns" key={i}>
-                    {array.map((movie) => {
-                      return (
-                        <Link href={`/movie/${movie.id}`} key={movie.id}>
-                          <a className="column is-3">
-                            <MovieCard name={movie.title} id={movie.id} />
-                          </a>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                );
-              })}
-          </section>
         </main>
       )}
     </Layout>
