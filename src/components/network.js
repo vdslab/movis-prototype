@@ -6,10 +6,12 @@
 import * as d3 from "d3";
 import { useEffect, useState, useRef } from "react";
 export default function Graph({ initialNetwork, selected, handleSelect }) {
-  const [highlightnode, setHighlightnode] = useState([]);
-  const [highlightlink, setHighlightlink] = useState([]);
   const [nodes, setNodes] = useState([]); //useEffect内でselectedが更新されるごとにデータも更新していく
   const [links, setLinks] = useState([]);
+  const [nodeid, setNodeid] = useState([]);
+  const [linkssource, setLinkssource] = useState([]); //これはぶっちゃけいらないと思うけど、参考演算子中に繰り返す方法がわからず配列が欲しかった
+  const [linkstarget, setLinkstarget] = useState([]);
+  // const halfwidth = 600;
   // const width =
   //   window.innerWidth < halfwidth
   //     ? window.innerWidth * 0.9
@@ -18,8 +20,10 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
 
   const wrapperRef = useRef();
   const [size, setSize] = useState({ width: 0, height: 0 }); //初期値の値でシミュレーションし終わった後にwindowのはばを取ってるからグラフが真ん中に来ないのとheightの値が更新されてレンダリングされている理由がわからない。
-  const { width, height } = size;
-  console.log(width, height);
+  const { width, height_ } = size;
+  const height = window.innerHeight;
+  // console.log(width, height);
+  // いまはheightの値をwindowの高さにして、widthは間によって変えています。
 
   const nodeHighlight = (node) => {
     const nodeId = node.id;
@@ -33,6 +37,7 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
       }
       return selectedNodeIds;
     });
+
     // console.log(selected);
     // const selectdepthnode_1 = [];
     // for (const item of links.id) {
@@ -65,6 +70,7 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
   useEffect(() => {
     const observer = new ResizeObserver((entries) => {
       if (wrapperRef.current) {
+        console.log(wrapperRef);
         const { clientWidth, clientHeight } = wrapperRef.current;
         setSize({ width: clientWidth, height: clientHeight });
       }
@@ -123,8 +129,13 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
     const startLineChart = async () => {
       const [nodes, links] = await (async () => {
         const data = initialNetwork;
+
         const nodes = Array();
         const links = Array();
+        const nodeid = Array(); //ここら辺はハイライト作成でわからなくなって作った。今度消すと思う。
+        const linkssource = Array();
+        const nodes_tartget = Array();
+
         const r = 10;
 
         for (const item of data.nodes) {
@@ -133,6 +144,7 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
             name: item.name,
             r,
           });
+          nodeid.push(item.id);
         }
         for (const item of data.links) {
           links.push({
@@ -140,62 +152,91 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
             target: item.target,
             r,
           });
+          linkssource.push(item.source);
+          linkstarget.push(item.target);
         }
-        return [nodes, links];
+        return [nodes, links, nodeid, linkssource, linkstarget];
       })();
+      setNodeid(nodeid.slice());
+      setLinkssource(linkssource.slice());
+      setLinkstarget(linkstarget.slice());
       firstSimuration(nodes, links);
     };
 
     startLineChart();
-  }, []); //最初とselectedが更新された時だけこれを実行するためのEffect　選択されたらデータも更新してその都度シュミレーションを行うことにしている。ハイライトの際はいらないのでmouseOverの時だけにするとか？
+  }, [selected]); //最初とselectedが更新された時だけこれを実行するためのEffect　選択されたらデータも更新してその都度シュミレーションを行うことにしている。ハイライトの際はいらないのでmouseOverの時だけにするとか？
+
+  function ZoomableSVG({ width, height, children }) {
+    console.log("ZoomableSVG");
+    const svgRef = useRef();
+    const [k, setK] = useState(1);
+    const [x, setX] = useState(0);
+    const [y, setY] = useState(0);
+    useEffect(() => {
+      const zoom = d3.zoom().on("zoom", (event) => {
+        const { x, y, k } = event.transform;
+        setK(k);
+        setX(x);
+        setY(y);
+      });
+      d3.select(svgRef.current).call(zoom);
+    }, []);
+    return (
+      <svg ref={svgRef} width={width} height={height}>
+        <g transform={`translate(${x},${y})scale(${k})`}>{children}</g>
+      </svg>
+    );
+  }
 
   return (
-    <div ref={wrapperRef}>
+    <div ref={wrapperRef} width="100" height="100">
       <svg
         className="graph"
         width={`${width}`}
         height={`${height}`}
         viewBox={`0 0 ${width} ${height}`}
       >
-        <g>
+        <ZoomableSVG width={width} height={height}>
           <g>
-            {links.map((link, i) => {
-              const target = link.target.id;
-              const source = link.source.id;
-              return (
-                <g key={i}>
-                  <line
-                    x1={link.target.x}
-                    y1={link.target.y}
-                    x2={link.source.x}
-                    y2={link.source.y}
-                    strokeWidth="1"
-                    stroke={"silver"}
-                  />
-                </g>
-              );
-            })}
+            <g>
+              {links.map((link, i) => {
+                const target = link.target.id;
+                const source = link.source.id;
+                return (
+                  <g key={i}>
+                    <line
+                      x1={link.target.x}
+                      y1={link.target.y}
+                      x2={link.source.x}
+                      y2={link.source.y}
+                      strokeWidth="1"
+                      stroke={"silver"}
+                    />
+                  </g>
+                );
+              })}
+            </g>
+            <g>
+              {nodes.map((node, i) => {
+                return (
+                  <g key={i}>
+                    <circle
+                      r="10"
+                      cx={node.x}
+                      cy={node.y}
+                      onClick={() => handleSelect(node)}
+                      fill={selected.includes(node.id) ? "black" : "silver"} //ここをどう変えるか。
+                      // highlightnode.includes(node.id) ? "black" : "silver"
+                    />
+                    <text fill="black" x={node.x + 10} y={node.y + 5}>
+                      {node.name}
+                    </text>
+                  </g>
+                );
+              })}
+            </g>
           </g>
-          <g>
-            {nodes.map((node, i) => {
-              return (
-                <g key={i}>
-                  <circle
-                    r="10"
-                    cx={node.x}
-                    cy={node.y}
-                    onClick={() => handleSelect(node)}
-                    fill={selected.includes(node.id) ? "black" : "silver"}
-                    // highlightnode.includes(node.id) ? "black" : "silver"
-                  />
-                  <text fill="black" x={node.x + 10} y={node.y + 5}>
-                    {node.name}
-                  </text>
-                </g>
-              );
-            })}
-          </g>
-        </g>
+        </ZoomableSVG>
       </svg>
     </div>
   );
