@@ -9,77 +9,81 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
   const [nodes, setNodes] = useState([]); //useEffect内でselectedが更新されるごとにデータも更新していく
   const [links, setLinks] = useState([]);
   const [nodeid, setNodeid] = useState([]);
-  const [linkssource, setLinkssource] = useState([]); //これはぶっちゃけいらないと思うけど、参考演算子中に繰り返す方法がわからず配列が欲しかった
+  const [linkssource, setLinkssource] = useState([]); //ハイライトで使うかもと思った。これはぶっちゃけいらないと思うけど、参考演算子中に繰り返す方法がわからず配列が欲しかった
   const [linkstarget, setLinkstarget] = useState([]);
   // const halfwidth = 600;
-  // const width =
+  //これは自分に合わせた大きさ
+  const width = window.innerWidth * 0.46;
+  const height = window.innerHeight;
+
   //   window.innerWidth < halfwidth
   //     ? window.innerWidth * 0.9
-  //     : window.innerWidth * 0.46;
-  // const height = window.innerHeight;
+  // window.innerWidth * 0.46;
 
-  const wrapperRef = useRef();
-  const [size, setSize] = useState({ width: 0, height: 0 }); //初期値の値でシミュレーションし終わった後にwindowのはばを取ってるからグラフが真ん中に来ないのとheightの値が更新されてレンダリングされている理由がわからない。
-  const { width, height_ } = size;
-  const height = window.innerHeight;
+  //ここら辺は変更に合わせてるやつ
+  // const wrapperRef = useRef();
+  // const [size, setSize] = useState({ width: 0, height: 0 }); //初期値の値でシミュレーションし終わった後にwindowのはばを取ってるからグラフが真ん中に来ないのとheightの値が更新されてレンダリングされている理由がわからない。
+  // const { width_, height_ } = size;
   // console.log(width, height);
   // いまはheightの値をwindowの高さにして、widthは間によって変えています。
 
-  const nodeHighlight = (node) => {
-    const nodeId = node.id;
-    setSelected((prev) => {
-      const index = prev.indexOf(nodeId);
-      const selectedNodeIds = [...prev];
-      if (index < 0) {
-        selectedNodeIds.push(nodeId);
-      } else {
-        selectedNodeIds.splice(index, 1);
-      }
-      return selectedNodeIds;
-    });
+  //ここはnodeをクリックしたときようのやつだが今はもうつかっていない
+  // const nodeHighlight = (node) => {
+  //   const nodeId = node.id;
+  //   setSelected((prev) => {
+  //     const index = prev.indexOf(nodeId);
+  //     const selectedNodeIds = [...prev];
+  //     if (index < 0) {
+  //       selectedNodeIds.push(nodeId);
+  //     } else {
+  //       selectedNodeIds.splice(index, 1);
+  //     }
+  //     return selectedNodeIds;
+  //   });
 
-    // console.log(selected);
-    // const selectdepthnode_1 = [];
-    // for (const item of links.id) {
-    //   if (selected.id === item.source) {
-    //     selectdepthnode_1.push(item.target);
-    //   // }
-    //   if (selected.id === item.target) {
-    //     selectdepthnode_1.push(item.source);
-    //   }
-    // }
-    // setHighlightnode(selectdepthnode_1);
-    // const selectdepthlink_1 = [];
-    // for (const item of links.id) {
-    //   if (selected.id === item.source || selected.id === item.target) {
-    //     links.push({
-    //       source: item.source,
-    //       target: item.target,
-    //       color: "black",
-    //     });
-    //   } else {
-    //     links.push({
-    //       source: item.source,
-    //       target: item.target,
-    //       color: "silver",
-    //     });
-    //   }
-    // }
-  };
+  //   // console.log(selected);
+  //   // const selectdepthnode_1 = [];
+  //   // for (const item of links.id) {
+  //   //   if (selected.id === item.source) {
+  //   //     selectdepthnode_1.push(item.target);
+  //   //   // }
+  //   //   if (selected.id === item.target) {
+  //   //     selectdepthnode_1.push(item.source);
+  //   //   }
+  //   // }
+  //   // setHighlightnode(selectdepthnode_1);
+  //   // const selectdepthlink_1 = [];
+  //   // for (const item of links.id) {
+  //   //   if (selected.id === item.source || selected.id === item.target) {
+  //   //     links.push({
+  //   //       source: item.source,
+  //   //       target: item.target,
+  //   //       color: "black",
+  //   //     });
+  //   //   } else {
+  //   //     links.push({
+  //   //       source: item.source,
+  //   //       target: item.target,
+  //   //       color: "silver",
+  //   //     });
+  //   //   }
+  //   // }
+  // };
 
-  useEffect(() => {
-    const observer = new ResizeObserver((entries) => {
-      if (wrapperRef.current) {
-        console.log(wrapperRef);
-        const { clientWidth, clientHeight } = wrapperRef.current;
-        setSize({ width: clientWidth, height: clientHeight });
-      }
-    });
-    observer.observe(wrapperRef.current);
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
+  // ここでネットワークの描画範囲をとっている。
+  // useEffect(() => {
+  //   const observer = new ResizeObserver((entries) => {
+  //     if (wrapperRef.current) {
+  //       console.log(wrapperRef);
+  //       const { clientWidth, clientHeight } = wrapperRef.current;
+  //       setSize({ width: clientWidth, height: clientHeight });
+  //     }
+  //   });
+  //   observer.observe(wrapperRef.current);
+  //   return () => {
+  //     observer.disconnect();
+  //   };
+  // }, []);
 
   useEffect(() => {
     const firstSimuration = (nodes, links) => {
@@ -129,6 +133,7 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
     const startLineChart = async () => {
       const [nodes, links] = await (async () => {
         const data = initialNetwork;
+        console.log(data);
 
         const nodes = Array();
         const links = Array();
@@ -164,10 +169,9 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
     };
 
     startLineChart();
-  }, [selected]); //最初とselectedが更新された時だけこれを実行するためのEffect　選択されたらデータも更新してその都度シュミレーションを行うことにしている。ハイライトの際はいらないのでmouseOverの時だけにするとか？
+  }, []); //最初とselectedが更新された時だけこれを実行するためのEffect　選択されたらデータも更新してその都度シュミレーションを行うことにしている。ハイライトの際はいらないのでmouseOverの時だけにするとか？
 
   function ZoomableSVG({ width, height, children }) {
-    console.log("ZoomableSVG");
     const svgRef = useRef();
     const [k, setK] = useState(1);
     const [x, setX] = useState(0);
@@ -189,7 +193,8 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
   }
 
   return (
-    <div ref={wrapperRef} width="100" height="100">
+    // <div ref={wrapperRef} width="100" height="100">
+    <div width="100" height="100">
       <svg
         className="graph"
         width={`${width}`}
@@ -225,10 +230,17 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
                       cx={node.x}
                       cy={node.y}
                       onClick={() => handleSelect(node)}
-                      fill={selected.includes(node.id) ? "black" : "silver"} //ここをどう変えるか。
+                      fill={selected.includes(node.id) ? "black" : "silver"} //ここをどう変えるか
+                      style={{ stroke: "black", strokeWidth: "1.0px" }}
                       // highlightnode.includes(node.id) ? "black" : "silver"
                     />
-                    <text fill="black" x={node.x + 10} y={node.y + 5}>
+
+                    <text
+                      className="kanekyo"
+                      // fill="black"
+                      x={node.x + 12}
+                      y={node.y + 5}
+                    >
                       {node.name}
                     </text>
                   </g>
