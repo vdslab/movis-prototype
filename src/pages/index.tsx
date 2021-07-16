@@ -16,6 +16,7 @@ interface ServerSideProps {
 const Home: React.VFC<ServerSideProps> = ({ query: { page, name } }) => {
   const [input, setInput] = useState({ name });
   const [actors, setActors] = useState<Actor[]>([]);
+  console.log(actors);
 
   const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput((prev) => {
@@ -48,29 +49,85 @@ const Home: React.VFC<ServerSideProps> = ({ query: { page, name } }) => {
           <div className="column is-one-quarter">
             <div className="box">
               <form>
-                <label className="label">名前</label>
-                <div className="field has-addons">
-                  <div className="control">
-                    <input
-                      name="name"
-                      className="input"
-                      type="text"
-                      value={input.name}
-                      onChange={handleChangeInput}
-                    />
+                <div className="py-4">
+                  <label className="label">俳優名</label>
+                  <div className="field has-addons">
+                    <div className="control">
+                      <input
+                        name="name"
+                        className="input"
+                        type="text"
+                        value={input.name}
+                        onChange={handleChangeInput}
+                      />
+                    </div>
+                    <div className="control">
+                      <Link
+                        href={{
+                          pathname: "/",
+                          query: {
+                            name: input.name,
+                            page,
+                          },
+                        }}
+                      >
+                        <button className="button is-link">検索</button>
+                      </Link>
+                    </div>
                   </div>
-                  <div className="control">
-                    <Link
-                      href={{
-                        pathname: "/",
-                        query: {
-                          name: input.name,
-                          page,
-                        },
-                      }}
-                    >
-                      <button className="button is-link">検索</button>
-                    </Link>
+                </div>
+                <div className="py-4">
+                  <label className="label">製作・制作会社名</label>
+                  <div className="field has-addons">
+                    <div className="control">
+                      <input
+                        name="あ"
+                        className="input"
+                        type="text"
+                        value={input.name}
+                        onChange={handleChangeInput}
+                      />
+                    </div>
+                    <div className="control">
+                      <Link
+                        href={{
+                          pathname: "/",
+                          query: {
+                            name: input.name,
+                            page,
+                          },
+                        }}
+                      >
+                        <button className="button is-link">検索</button>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+                <div className="py-4">
+                  <label className="label">監督・脚本</label>
+                  <div className="field has-addons">
+                    <div className="control">
+                      <input
+                        name="あい"
+                        className="input"
+                        type="text"
+                        value={input.name}
+                        onChange={handleChangeInput}
+                      />
+                    </div>
+                    <div className="control">
+                      <Link
+                        href={{
+                          pathname: "/",
+                          query: {
+                            name: input.name,
+                            page,
+                          },
+                        }}
+                      >
+                        <button className="button is-link">検索</button>
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </form>

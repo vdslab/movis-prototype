@@ -16,11 +16,13 @@ const ActorDetails = ({ query: { actorId } }) => {
   const [movies, setMovies] = useState([]);
   const [imageSrc, setImageSrc] = useState("/noImage.jpeg");
   const nodes = [];
+  const nodeIds = [];
   const links = [];
   if (data) {
     for (const movie of data.Movie) {
       for (const actor of movie.Actor) {
-        if (!(actor.id in nodes) && data.id !== actor.id) {
+        if (!nodeIds.includes(actor.id) && data.id !== actor.id) {
+          nodeIds.push(actor.id);
           nodes.push({ id: actor.id, name: actor.name });
         }
       }
@@ -120,22 +122,29 @@ const ActorDetails = ({ query: { actorId } }) => {
       {data && (
         <main>
           <div className="columns margin-top mt-6">
-            <div className="column margin-left ml-5">
+            <div className="column margin-left ml-5 is-flex is-justify-content-center">
               {/* <Image width="340px" height="510px" src={"/noImage.jpeg"} /> */}
-              <img width="622px" height="933px" src={imageSrc} />
-              <h1 className="title">
-                {/* <u>森菜々</u> */}
+              <img width="300px" height="450px" src={imageSrc} />
+              {/* <h1 className="title">
                 <u>{data.name}</u>
-              </h1>
-              {/* <p>・女性</p>
-            <p>・2001年8月31日生まれ</p>
-            <p>・デビュー曲となる主題歌「カエルノウタ」を</p>
-            <p>　2020年1月15日にリリースする。</p> */}
+              </h1> */}
+            </div>
+            <div className="column is-flex is-align-items-center">
+              <div>
+                <h1 className="title">{data.name}</h1>
+                <p>・女性</p>
+                <p>・2001年8月31日生まれ</p>
+                <p>・デビュー曲となる主題歌「カエルノウタ」を</p>
+                <p>　2020年1月15日にリリースする。</p>
+              </div>
             </div>
           </div>
 
           <div className="columns">
-            <div className="column is-7 has-background-warning">
+            <div
+              className="ml-2 column is-7 has-background-"
+              style={{ height: "1000px" }}
+            >
               <Network
                 initialNetwork={{ nodes, links }}
                 selected={selected}
@@ -146,14 +155,16 @@ const ActorDetails = ({ query: { actorId } }) => {
               <section className="section">
                 {movies
                   .filter((movie) => {
+                    let count = 0;
                     if (selected.length === 0) {
                       return true;
                     }
                     for (const actor of movie.Actor) {
                       if (selected.includes(actor.id)) {
-                        return true;
+                        count++;
                       }
                     }
+                    return count === selected.length;
                   })
                   .reduce(
                     (a, c, i) =>
@@ -168,7 +179,7 @@ const ActorDetails = ({ query: { actorId } }) => {
                         {array.map((movie) => {
                           return (
                             <Link href={`/movie/${movie.id}`} key={movie.id}>
-                              <a className="column is-6">
+                              <a className="column">
                                 <MovieCard name={movie.title} id={movie.id} />
                               </a>
                             </Link>
