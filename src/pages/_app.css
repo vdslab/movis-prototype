@@ -1,0 +1,17 @@
+/* * {
+  font-family: "Sawarabi Mincho";
+  color: red;
+}
+h1.title {
+  font-family: "Sawarabi Mincho";
+  color: red;
+} */
+text.kanekyo {
+  font-family: "Sawarabi Mincho";
+  font-weight: 800;
+}
+/* 
+g > text.kanekyo {
+  font-family: "Sawarabi Mincho";
+  color: red;
+} */
