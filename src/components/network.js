@@ -186,7 +186,13 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
       d3.select(svgRef.current).call(zoom);
     }, []);
     return (
-      <svg ref={svgRef} width={width} height={height}>
+      <svg
+        ref={svgRef}
+        className="graph"
+        width={width}
+        height={height}
+        viewBox={`0 0 ${width} ${height}`}
+      >
         <g transform={`translate(${x},${y})scale(${k})`}>{children}</g>
       </svg>
     );
@@ -195,61 +201,54 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
   return (
     // <div ref={wrapperRef} width="100" height="100">
     <div width="100" height="100">
-      <svg
-        className="graph"
-        width={`${width}`}
-        height={`${height}`}
-        viewBox={`0 0 ${width} ${height}`}
-      >
-        <ZoomableSVG width={width} height={height}>
+      <ZoomableSVG width={width} height={height}>
+        <g>
           <g>
-            <g>
-              {links.map((link, i) => {
-                const target = link.target.id;
-                const source = link.source.id;
-                return (
-                  <g key={i}>
-                    <line
-                      x1={link.target.x}
-                      y1={link.target.y}
-                      x2={link.source.x}
-                      y2={link.source.y}
-                      strokeWidth="1"
-                      stroke={"silver"}
-                    />
-                  </g>
-                );
-              })}
-            </g>
-            <g>
-              {nodes.map((node, i) => {
-                return (
-                  <g key={i}>
-                    <circle
-                      r="10"
-                      cx={node.x}
-                      cy={node.y}
-                      onClick={() => handleSelect(node)}
-                      fill={selected.includes(node.id) ? "black" : "silver"} //ここをどう変えるか
-                      style={{ stroke: "black", strokeWidth: "1.0px" }}
-                      // highlightnode.includes(node.id) ? "black" : "silver"
-                    />
-
-                    <text
-                      className="kanekyo"
-                      // fill="black"
-                      x={node.x + 12}
-                      y={node.y + 5}
-                    >
-                      {node.name}
-                    </text>
-                  </g>
-                );
-              })}
-            </g>
+            {links.map((link, i) => {
+              const target = link.target.id;
+              const source = link.source.id;
+              return (
+                <g key={i}>
+                  <line
+                    x1={link.target.x}
+                    y1={link.target.y}
+                    x2={link.source.x}
+                    y2={link.source.y}
+                    strokeWidth="1"
+                    stroke={"silver"}
+                  />
+                </g>
+              );
+            })}
           </g>
-        </ZoomableSVG>
-      </svg>
+          <g>
+            {nodes.map((node, i) => {
+              return (
+                <g key={i}>
+                  <circle
+                    r="10"
+                    cx={node.x}
+                    cy={node.y}
+                    onClick={() => handleSelect(node)}
+                    fill={selected.includes(node.id) ? "black" : "silver"} //ここをどう変えるか
+                    style={{ stroke: "black", strokeWidth: "1.0px" }}
+                    // highlightnode.includes(node.id) ? "black" : "silver"
+                  />
+
+                  <text
+                    className="kanekyo"
+                    // fill="black"
+                    x={node.x + 12}
+                    y={node.y + 5}
+                  >
+                    {node.name}
+                  </text>
+                </g>
+              );
+            })}
+          </g>
+        </g>
+      </ZoomableSVG>
     </div>
   );
 }
