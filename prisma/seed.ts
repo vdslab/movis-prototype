@@ -29,12 +29,15 @@ const main = async () => {
       url: string;
       caption: string | null;
     } | null;
-    const runtime = data["runtime"] ? Number(data["runtime"]) : null;
+    const runtime = data["runtime"] ? data["runtime"] : null;
     const staffs = data["staff"] as {
       name: string;
       id: string | null;
       occupation: string;
     }[];
+    const revenueScale = 10 ** 9;
+    const revenue = data["revenue"] ? data["revenue"] * revenueScale : null;
+    const awards = data["award"] as string[];
 
     for (const actor of actors) {
       let uuid;
@@ -176,12 +179,16 @@ const main = async () => {
             ? {
                 url: officialSite,
               }
-            : null,
+            : undefined,
         },
         Staff: {
           connect: staffs.map((staff) => ({ id: staff["uuid"] })),
         },
         runtime: runtime,
+        Award: {
+          create: awards.map((award) => ({ title: award })),
+        },
+        revenue,
       },
     });
     console.log(`moive created with id: ${movie.id}`);
