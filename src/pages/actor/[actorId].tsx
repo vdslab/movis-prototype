@@ -34,7 +34,11 @@ const ActorDetails = ({ data }: Props) => {
   const actorName = data.name;
   const actorId = data.id;
   const movieImgUrls = data.movieImgUrls;
-  const movies: { [id: string]: Movie } = {};
+  const movies: {
+    [id: string]: Movie & {
+      Actor: Actor[];
+    };
+  } = {};
   data.Movie.forEach((movie) => {
     movies[movie.id] = movie;
   });
@@ -126,13 +130,27 @@ const ActorDetails = ({ data }: Props) => {
             <div className="column">
               <div className="columns is-multiline">
                 {movieImgUrls.map(({ id, imgUrl }) => {
-                  return (
-                    <Link href={`/movie/${id}`} key={id}>
-                      <a className="column is-6">
-                        <Card caption={movies[id].title} imgUrl={imgUrl} />
-                      </a>
-                    </Link>
-                  );
+                  if (
+                    selected.length === 0 ||
+                    selected.every((selectedId) =>
+                      movies[id].Actor.map((actor) => actor.id).includes(
+                        selectedId
+                      )
+                    )
+                    // movies[id].Actor.map((actor) => actor.id).every((id) =>
+                    //   selected.includes(id)
+                    // )
+                  ) {
+                    return (
+                      <Link href={`/movie/${id}`} key={id}>
+                        <a className="column is-6">
+                          <Card caption={movies[id].title} imgUrl={imgUrl} />
+                        </a>
+                      </Link>
+                    );
+                  } else {
+                    return null;
+                  }
                 })}
               </div>
             </div>
