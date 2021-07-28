@@ -16,11 +16,20 @@ model Movie {
   releaseDate  DateTime?
   runtime      Int? /// minutes
   story        String?
+  revenue      Float?
   OfficialSite OfficialSite?
   Staff        Staff[]
   Actor        Actor[]
   Company      Company[]
   Category     Category[]
+  Award        Award[]
+}
+
+model Award {
+  id      String @id @default(uuid())
+  title   String
+  Movie   Movie  @relation(fields: [movieId], references: [id])
+  movieId String
 }
 
 model Actor {
