@@ -8,6 +8,8 @@ import { forceSerialize } from "~/lib/forceSerialize";
 import { Card } from "~/components/card";
 import prisma from "~/lib/prisma";
 import dynamic from "next/dynamic";
+import { ResponsiveTreeMap } from "@nivo/treemap";
+import { ResponsiveLine } from "@nivo/line";
 
 const Network = dynamic(() => import("~/components/network"), { ssr: false });
 
@@ -42,6 +44,45 @@ const ActorDetails = ({ data }: Props) => {
   data.Movie.forEach((movie) => {
     movies[movie.id] = movie;
   });
+  const wrapperStyle = {
+    height: "600px",
+  };
+  const yearSet = new Set();
+  data.Movie.forEach((movie) => {
+    const year = (movie.releaseDate as any).slice(0, 4);
+    yearSet.add(year);
+  });
+  const years = Array.from(yearSet);
+  const treeMapData = {
+    title: "movies",
+    children: years.map((year) => {
+      return {
+        title: year,
+        children: data.Movie.filter(
+          (movie) => (movie.releaseDate as any).slice(0, 4) === year
+        ).map((movie) => {
+          return {
+            title: movie.title,
+            count: 1,
+          };
+        }),
+      };
+    }),
+  };
+
+  const lineData = [
+    {
+      id: actorName,
+      data: years.map((year) => {
+        return {
+          x: year as string,
+          y: data.Movie.filter(
+            (movie) => (movie.releaseDate as any).slice(0, 4) === year
+          ).length,
+        };
+      }),
+    },
+  ];
 
   const nodeIds = [];
   const nodes = [];
@@ -105,12 +146,73 @@ const ActorDetails = ({ data }: Props) => {
       {data && (
         <main className="section">
           <div className="columns">
-            <div className="column">
+            <div className="column is-3">
               <img width="300px" height="450px" src={actorImgUrl} />
             </div>
-            <div className="column is-flex is-align-items-center">
+            <div
+              className="column"
+              // className="column is-flex is-align-items-center"
+            >
               <div>
                 <h1 className="title">{actorName}</h1>
+              </div>
+              <div style={wrapperStyle}>
+                <ResponsiveTreeMap
+                  data={treeMapData}
+                  identity="title"
+                  value="count"
+                  label={"id"}
+                  margin={{ top: 10, right: 10, bottom: 10, left: 10 }}
+                  labelSkipSize={0}
+                  colors={{ scheme: "paired" }}
+                  labelTextColor={{
+                    from: "color",
+                    modifiers: [["darker", 3]],
+                  }}
+                  parentLabelSize={40}
+                  parentLabelTextColor={{
+                    from: "color",
+                    modifiers: [["darker", 2]],
+                  }}
+                  borderColor={{ from: "color", modifiers: [["darker", 0.1]] }}
+                />
+              </div>
+              <div style={{ height: "300px" }}>
+                <ResponsiveLine
+                  data={lineData}
+                  margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
+                  xScale={{ type: "point" }}
+                  yScale={{
+                    type: "linear",
+                    min: "auto",
+                    max: "auto",
+                    stacked: true,
+                    reverse: false,
+                  }}
+                  axisRight={null}
+                  lineWidth={5}
+                  axisBottom={{
+                    tickSize: 5,
+                    tickPadding: 5,
+                    tickRotation: 0,
+                    legendOffset: 36,
+                    legendPosition: "middle",
+                  }}
+                  axisLeft={{
+                    tickSize: 5,
+                    tickPadding: 5,
+                    tickRotation: 0,
+                    legendOffset: -40,
+                    legendPosition: "middle",
+                  }}
+                  pointSize={10}
+                  pointColor={{ theme: "background" }}
+                  pointBorderWidth={2}
+                  pointBorderColor={{ from: "serieColor" }}
+                  pointLabelYOffset={-12}
+                  useMesh={true}
+                  colors={{ scheme: "paired" }}
+                />
               </div>
             </div>
           </div>
