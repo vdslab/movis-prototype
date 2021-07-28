@@ -5,6 +5,34 @@
 // ネットワークに必要な情報自体の要素が何になるのかをなるはやで選定
 import * as d3 from "d3";
 import { useEffect, useState, useRef } from "react";
+
+function ZoomableSVG({ width, height, children }) {
+  const svgRef = useRef();
+  const [k, setK] = useState(1);
+  const [x, setX] = useState(0);
+  const [y, setY] = useState(0);
+  useEffect(() => {
+    const zoom = d3.zoom().on("zoom", (event) => {
+      const { x, y, k } = event.transform;
+      setK(k);
+      setX(x);
+      setY(y);
+    });
+    d3.select(svgRef.current).call(zoom);
+  }, []);
+  return (
+    <svg
+      ref={svgRef}
+      className="graph"
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
+    >
+      <g transform={`translate(${x},${y})scale(${k})`}>{children}</g>
+    </svg>
+  );
+}
+
 export default function Graph({ initialNetwork, selected, handleSelect }) {
   const [nodes, setNodes] = useState([]); //useEffect内でselectedが更新されるごとにデータも更新していく
   const [links, setLinks] = useState([]);
@@ -87,6 +115,7 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
 
   useEffect(() => {
     const firstSimuration = (nodes, links) => {
+      console.log("SGHJK");
       //ここ参照https://wizardace.com/d3-forcesimulation-onlynode/
       //やっぱここの値おおきくしないとまとまんねえ
       const simulation = d3
@@ -170,33 +199,6 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
 
     startLineChart();
   }, []); //最初とselectedが更新された時だけこれを実行するためのEffect　選択されたらデータも更新してその都度シュミレーションを行うことにしている。ハイライトの際はいらないのでmouseOverの時だけにするとか？
-
-  function ZoomableSVG({ width, height, children }) {
-    const svgRef = useRef();
-    const [k, setK] = useState(1);
-    const [x, setX] = useState(0);
-    const [y, setY] = useState(0);
-    useEffect(() => {
-      const zoom = d3.zoom().on("zoom", (event) => {
-        const { x, y, k } = event.transform;
-        setK(k);
-        setX(x);
-        setY(y);
-      });
-      d3.select(svgRef.current).call(zoom);
-    }, []);
-    return (
-      <svg
-        ref={svgRef}
-        className="graph"
-        width={width}
-        height={height}
-        viewBox={`0 0 ${width} ${height}`}
-      >
-        <g transform={`translate(${x},${y})scale(${k})`}>{children}</g>
-      </svg>
-    );
-  }
 
   return (
     // <div ref={wrapperRef} width="100" height="100">
