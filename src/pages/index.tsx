@@ -76,7 +76,7 @@ const Home: React.VFC<ServerSideProps> = ({ query: { page, name } }) => {
                     </div>
                   </div>
                 </div>
-                <div className="py-4">
+                {/* <div className="py-4">
                   <label className="label">製作・制作会社名</label>
                   <div className="field has-addons">
                     <div className="control">
@@ -129,7 +129,7 @@ const Home: React.VFC<ServerSideProps> = ({ query: { page, name } }) => {
                       </Link>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </form>
             </div>
           </div>
