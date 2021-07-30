@@ -36,9 +36,7 @@ function ZoomableSVG({ width, height, children }) {
 export default function Graph({ initialNetwork, selected, handleSelect }) {
   const [nodes, setNodes] = useState([]); //useEffect内でselectedが更新されるごとにデータも更新していく
   const [links, setLinks] = useState([]);
-  const [nodeid, setNodeid] = useState([]);
-  const [linkssource, setLinkssource] = useState([]); //ハイライトで使うかもと思った。これはぶっちゃけいらないと思うけど、参考演算子中に繰り返す方法がわからず配列が欲しかった
-  const [linkstarget, setLinkstarget] = useState([]);
+  const [hilightnode, setHilightNode] = useState({});
   // const halfwidth = 600;
   //これは自分に合わせた大きさ
   const width = window.innerWidth * 0.46;
@@ -115,7 +113,6 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
 
   useEffect(() => {
     const firstSimuration = (nodes, links) => {
-      console.log("SGHJK");
       //ここ参照https://wizardace.com/d3-forcesimulation-onlynode/
       //やっぱここの値おおきくしないとまとまんねえ
       const simulation = d3
@@ -162,13 +159,19 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
     const startLineChart = async () => {
       const [nodes, links] = await (async () => {
         const data = initialNetwork;
-        console.log(data);
 
         const nodes = Array();
         const links = Array();
-        const nodeid = Array(); //ここら辺はハイライト作成でわからなくなって作った。今度消すと思う。
-        const linkssource = Array();
-        const nodes_tartget = Array();
+        let hilightnodes = {};
+        for (const item of data.nodes) {
+          hilightnodes[`${item.id}`] = [];
+        }
+
+        for (const item of data.links) {
+          hilightnodes[`${item.source}`].push(item.target);
+          hilightnodes[`${item.target}`].push(item.source);
+        }
+        setHilightNode(hilightnodes);
 
         const r = 10;
 
@@ -178,7 +181,6 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
             name: item.name,
             r,
           });
-          nodeid.push(item.id);
         }
         for (const item of data.links) {
           links.push({
@@ -186,14 +188,10 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
             target: item.target,
             r,
           });
-          linkssource.push(item.source);
-          linkstarget.push(item.target);
         }
-        return [nodes, links, nodeid, linkssource, linkstarget];
+        return [nodes, links];
       })();
-      setNodeid(nodeid.slice());
-      setLinkssource(linkssource.slice());
-      setLinkstarget(linkstarget.slice());
+      // console.log(hilightnodes);
       firstSimuration(nodes, links);
     };
 
@@ -217,7 +215,12 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
                     x2={link.source.x}
                     y2={link.source.y}
                     strokeWidth="1"
-                    stroke={"silver"}
+                    stroke={
+                      selected.includes(link.source.id) ||
+                      selected.includes(link.target.id)
+                        ? "red"
+                        : "silver"
+                    }
                   />
                 </g>
               );
@@ -232,7 +235,15 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
                     cx={node.x}
                     cy={node.y}
                     onClick={() => handleSelect(node)}
-                    fill={selected.includes(node.id) ? "black" : "silver"} //ここをどう変えるか
+                    fill={
+                      selected.includes(node.id)
+                        ? "black"
+                        : selected.some((select, i) => {
+                            return hilightnode[`${select}`].includes(node.id);
+                          })
+                        ? "red"
+                        : "silver"
+                    } //ここをどう変えるか
                     style={{ stroke: "black", strokeWidth: "1.0px" }}
                     // highlightnode.includes(node.id) ? "black" : "silver"
                   />
