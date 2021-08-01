@@ -19,7 +19,12 @@ export const getActorImgUrl = async (name: string) => {
 
   const data = await res.json();
 
-  if (data?.results[0]?.profile_path) {
+  if (
+    data?.results &&
+    data.results &&
+    data.results.length !== 0 &&
+    data.results[0]?.profile_path
+  ) {
     const actorImgPath = data.results[0].profile_path;
     const actorImgUrl = `${imgBaseUri}${actorImgPath}`;
 
@@ -42,7 +47,12 @@ export const getMovieImgUrl = async (name: string) => {
   const res = await fetch(`${requestUrl}?${params.toString()}`);
   const data = await res.json();
 
-  if (data?.results[0]?.poster_path) {
+  if (
+    data?.results &&
+    data.results &&
+    data.results.length !== 0 &&
+    data?.results[0]?.poster_path
+  ) {
     const movieImgPath = data.results[0].poster_path;
     const movieImgUrl = `${imgBaseUri}${movieImgPath}`;
 
