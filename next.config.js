@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires, no-undef */
 
 const path = require("path");
+const CopyPlugin = require("copy-webpack-plugin");
 
 function generateIncludes(modules) {
   return [
@@ -74,4 +75,17 @@ const config = {
 };
 
 // module.exports = withTM(config)
-module.exports = config;
+module.exports = {
+  config,
+  future: {
+    webpack5: true,
+  },
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    config.plugins.push(
+      new CopyPlugin({
+        patterns: ["prisma/dev.db"],
+      })
+    );
+    return config;
+  },
+};

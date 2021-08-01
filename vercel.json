@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "src/pages/**/*": {
+      "includeFiles": "prisma/dev.db"
+    }
+  }
+}
