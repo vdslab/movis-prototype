@@ -52,7 +52,7 @@ const ActorDetails = ({ data }: Props) => {
     const year = (movie.releaseDate as any).slice(0, 4);
     yearSet.add(year);
   });
-  const years = Array.from(yearSet);
+  const years = Array.from(yearSet).sort((a, b) => Number(a) - Number(b));
   const treeMapData = {
     title: "movies",
     children: years.map((year) => {
@@ -157,7 +157,7 @@ const ActorDetails = ({ data }: Props) => {
               <div>
                 <h1 className="title">{actorName}</h1>
               </div>
-              <div style={wrapperStyle}>
+              {/* <div style={wrapperStyle}>
                 <ResponsiveTreeMap
                   data={treeMapData}
                   identity="title"
@@ -177,7 +177,7 @@ const ActorDetails = ({ data }: Props) => {
                   }}
                   borderColor={{ from: "color", modifiers: [["darker", 0.1]] }}
                 />
-              </div>
+              </div> */}
               <div style={{ height: "300px" }}>
                 <ResponsiveLine
                   data={lineData}
@@ -185,13 +185,14 @@ const ActorDetails = ({ data }: Props) => {
                   xScale={{ type: "point" }}
                   yScale={{
                     type: "linear",
-                    min: "auto",
+                    min: 0,
                     max: "auto",
                     stacked: true,
                     reverse: false,
                   }}
                   axisRight={null}
                   lineWidth={5}
+                  {...{ yScale: undefined }}
                   axisBottom={{
                     tickSize: 5,
                     tickPadding: 5,
@@ -211,6 +212,7 @@ const ActorDetails = ({ data }: Props) => {
                   pointBorderWidth={2}
                   pointBorderColor={{ from: "serieColor" }}
                   pointLabelYOffset={-12}
+                  pointLabel="y"
                   useMesh={true}
                   colors={{ scheme: "paired" }}
                 />
