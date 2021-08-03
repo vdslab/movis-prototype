@@ -28,19 +28,43 @@ const Home: React.VFC<ServerSideProps> = ({ query: { page, name } }) => {
   };
 
   useEffect(() => {
-    (async () => {
-      const params = new URLSearchParams();
-      params.set("page", "1");
-      if (name) {
-        params.set("name", name);
-      }
+    if (name) {
+      (async () => {
+        const res = await fetch(`/api/actor/name/${name}`);
+        const data: Actor[] = await res.json();
 
-      const res = await fetch(`/api/actors?${params.toString()}`);
-      const data: Actor[] = await res.json();
+        setActors(data);
+      })();
+    } else {
+      (async () => {
+        const params = new URLSearchParams();
+        params.set("page", "1");
+        if (name) {
+          params.set("name", name);
+        }
 
-      setActors(data);
-    })();
+        const res = await fetch(`/api/actors?${params.toString()}`);
+        const data: Actor[] = await res.json();
+
+        setActors(data);
+      })();
+    }
   }, [name, page]);
+
+  // useEffect(() => {
+  //   (async () => {
+  //     const params = new URLSearchParams();
+  //     params.set("page", "1");
+  //     if (name) {
+  //       params.set("name", name);
+  //     }
+
+  //     const res = await fetch(`/api/actors?${params.toString()}`);
+  //     const data: Actor[] = await res.json();
+
+  //     setActors(data);
+  //   })();
+  // }, [name, page]);
 
   return (
     <Layout>
