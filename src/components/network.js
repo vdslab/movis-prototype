@@ -1,8 +1,3 @@
-// 今現時点でのわかってないこと
-// データ選択時のfilterの仕方(これは手を動かせって感じ)
-// 終わってないこと
-// データだけ更新の処理
-// ネットワークに必要な情報自体の要素が何になるのかをなるはやで選定
 import * as d3 from "d3";
 import { useEffect, useState, useRef } from "react";
 
@@ -36,7 +31,9 @@ function ZoomableSVG({ width, height, children }) {
 export default function Graph({ initialNetwork, selected, handleSelect }) {
   const [nodes, setNodes] = useState([]); //useEffect内でselectedが更新されるごとにデータも更新していく
   const [links, setLinks] = useState([]);
-  const [hilightnode, setHilightNode] = useState({});
+  const [highlightnode, sethighlightNode] = useState({}); //これをアクターの方で実装して、赤と黒をまとめた配列をあくたーから持ってくればいいのかな？
+  const [highlightlist, sethighlightList] = useState([]);
+  // 添え字sourceとtargetのhighlight=Trueとか入れたりするといいかも？　setNodes.slice
   // const halfwidth = 600;
   //これは自分に合わせた大きさ
   const width = window.innerWidth * 0.46;
@@ -162,16 +159,16 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
 
         const nodes = Array();
         const links = Array();
-        let hilightnodes = {};
+        let highlightnodes = {};
         for (const item of data.nodes) {
-          hilightnodes[`${item.id}`] = [];
+          highlightnodes[`${item.id}`] = [];
         }
 
         for (const item of data.links) {
-          hilightnodes[`${item.source}`].push(item.target);
-          hilightnodes[`${item.target}`].push(item.source);
+          highlightnodes[`${item.source}`].push(item.target);
+          highlightnodes[`${item.target}`].push(item.source);
         }
-        setHilightNode(hilightnodes);
+        sethighlightNode(highlightnodes);
 
         const r = 10;
 
@@ -186,18 +183,50 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
           links.push({
             source: item.source,
             target: item.target,
+            weight: item.weight,
             r,
           });
         }
         return [nodes, links];
       })();
-      // console.log(hilightnodes);
       firstSimuration(nodes, links);
     };
 
     startLineChart();
   }, []); //最初とselectedが更新された時だけこれを実行するためのEffect　選択されたらデータも更新してその都度シュミレーションを行うことにしている。ハイライトの際はいらないのでmouseOverの時だけにするとか？
 
+  useEffect(() => {
+    const highlightlist_ = Array();
+    if (selected.length !== 0) {
+      nodes.map((node, i) => {
+        if (
+          selected.every((select, i) => {
+            return highlightnode[`${select}`].includes(node.id);
+          })
+        ) {
+          highlightlist_.push(node.id);
+        }
+      });
+    }
+    links.map((link, i) => {
+      if (
+        selected.includes(link.target.id) &&
+        selected.includes(link.source.id)
+      ) {
+        link.highlight = "black";
+      } else if (
+        (selected.includes(link.target.id) ||
+          selected.includes(link.source.id)) &&
+        (highlightlist_.includes(link.target.id) ||
+          highlightlist_.includes(link.source.id))
+      ) {
+        link.highlight = "red";
+      } else {
+        link.highlight = "silver";
+      }
+    });
+    sethighlightList(highlightlist_.slice());
+  }, [selected, nodes, links]);
   return (
     // <div ref={wrapperRef} width="100" height="100">
     <div width="100" height="100">
@@ -215,12 +244,7 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
                     x2={link.source.x}
                     y2={link.source.y}
                     strokeWidth="1"
-                    stroke={
-                      selected.includes(link.source.id) ||
-                      selected.includes(link.target.id)
-                        ? "red"
-                        : "silver"
-                    }
+                    stroke={link.highlight}
                   />
                 </g>
               );
@@ -238,8 +262,10 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
                     fill={
                       selected.includes(node.id)
                         ? "black"
-                        : selected.some((select, i) => {
-                            return hilightnode[`${select}`].includes(node.id);
+                        : selected.length === 0
+                        ? "silver"
+                        : selected.every((select, i) => {
+                            return highlightnode[`${select}`].includes(node.id);
                           })
                         ? "red"
                         : "silver"
