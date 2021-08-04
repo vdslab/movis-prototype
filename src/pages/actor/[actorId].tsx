@@ -254,14 +254,14 @@ const ActorDetails = ({ data }: Props) => {
                 {movieImgUrls.map(({ id, imgUrl }) => {
                   if (
                     selected.length === 0 ||
-                    // selected.every((selectedId) =>
-                    //   movies[id].Actor.map((actor) => actor.id).includes(
-                    //     selectedId
-                    //   )
-                    // )
-                    movies[id].Actor.some((actor) =>
-                      selected.includes(actor.id)
+                    selected.every((selectedId) =>
+                      movies[id].Actor.map((actor) => actor.id).includes(
+                        selectedId
+                      )
                     )
+                    // movies[id].Actor.some((actor) =>
+                    //   selected.includes(actor.id)
+                    // )
                   ) {
                     return (
                       <Link href={`/movie/${id}`} key={id}>
