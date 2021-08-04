@@ -49,11 +49,11 @@ export default function Graph({
   const svgSize = Math.min(width, height) - borderWeight * 2;
 
   const max = Math.max(...Object.keys(count).map((key) => count[key]));
-  const min = Math.min(...Object.keys(count).map((key) => count[key]));
+  const min = 1;
 
   const normalNodeColor = d3.interpolateGreens;
-  const highlightNodeColor = d3.interpolateOranges;
-  const selectedNodeColor = d3.interpolateBlues;
+  const highlightNodeColor = d3.interpolateBlues;
+  const selectedNodeColor = d3.interpolateOranges;
   // d3.scaleSequential(d3.interpolateRainbow).domain([0, 20]);
 
   //   window.innerWidth < halfwidth
@@ -147,22 +147,22 @@ export default function Graph({
             .distance((d) => 10)
             .id((d) => d.id)
         )
-        // .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("center", d3.forceCenter(svgSize / 2, svgSize / 2))
-        .force("charge", d3.forceManyBody().strength(-1000)) //縮小していいかどうか全体を描画してから縮小一番上のノードと一番下のノードの高さ（横も叱り）の絶対値から全体の描画の大きさがわかる
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        // .force("center", d3.forceCenter(svgSize / 2, svgSize / 2))
+        .force("charge", d3.forceManyBody().strength(-2000)) //縮小していいかどうか全体を描画してから縮小一番上のノードと一番下のノードの高さ（横も叱り）の絶対値から全体の描画の大きさがわかる
         .force(
           "x",
           d3
             .forceX()
-            .x(svgSize / 2)
+            .x(width / 2)
             .strength(0.9)
         )
         .force(
           "y",
           d3
             .forceY()
-            .y(svgSize / 2)
-            .strength(0.9)
+            .y(height / 2)
+            .strength(1.5)
         );
 
       simulation.nodes(nodes);
@@ -191,10 +191,12 @@ export default function Graph({
         const r = 10;
 
         for (const item of data.nodes) {
+          const normalizedCount =
+            max > 1 ? (count[item.id] - min) / (max - min) : 0.5;
           nodes.push({
             id: item.id,
             name: item.name,
-            r,
+            r: (normalizedCount + 0.2) * 20,
           });
         }
         for (const item of data.links) {
@@ -227,20 +229,23 @@ export default function Graph({
       });
     }
     links.map((link, i) => {
+      const sourceId = link.source.id;
+      const targetId = link.target.id;
       if (
         selected.includes(link.target.id) &&
         selected.includes(link.source.id)
       ) {
-        link.highlight = "black";
+        link.highlight = "#E64A19";
       } else if (
         (selected.includes(link.target.id) ||
           selected.includes(link.source.id)) &&
         (highlightlist_.includes(link.target.id) ||
           highlightlist_.includes(link.source.id))
       ) {
-        link.highlight = "red";
+        link.highlight = "#9C27B0";
       } else {
-        link.highlight = "silver";
+        link.highlight =
+          count[sourceId] > 1 || count[targetId] > 1 ? "#CFD8DC" : null;
       }
     });
     sethighlightList(highlightlist_.slice());
@@ -250,11 +255,13 @@ export default function Graph({
     <div
       style={{
         border: `${borderWeight}px solid #FCE08A`,
-        width: Math.min(width, height),
-        height: Math.min(width, height),
+        // width: Math.min(width, height),
+        // height: Math.min(width, height),
+        width,
+        height,
       }}
     >
-      <ZoomableSVG width={svgSize} height={svgSize}>
+      <ZoomableSVG width={width} height={height}>
         {/* <ZoomableSVG width={width} height={height}> */}
         <g>
           <g>
@@ -282,13 +289,13 @@ export default function Graph({
               return (
                 <g key={i}>
                   <circle
-                    r="10"
+                    r={node.r}
                     cx={node.x}
                     cy={node.y}
                     onClick={() => handleSelect(node)}
                     fill={
                       selected.includes(node.id)
-                        ? selectedNodeColor(normalizedCount)
+                        ? "#FFB300" //selectedNodeColor(normalizedCount)
                         : selected.length === 0
                         ? normalNodeColor(normalizedCount)
                         : selected.every((select, i) => {
@@ -297,7 +304,7 @@ export default function Graph({
                         ? highlightNodeColor(normalizedCount)
                         : normalNodeColor(normalizedCount)
                     } //ここをどう変えるか
-                    style={{ stroke: "black", strokeWidth: "1.0px" }}
+                    style={{ stroke: "#546E7A", strokeWidth: "1px" }}
                     // highlightnode.includes(node.id) ? "black" : "silver"
                   />
 

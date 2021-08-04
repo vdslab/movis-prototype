@@ -12,7 +12,10 @@ export const Card = ({ caption, imgUrl }: Props) => {
         </figure>
       </div>
       <div className="card-content">
-        <div className="content">{caption}</div>
+        <div className="content">
+          {caption.slice(0, 10)}
+          {caption.length > 10 && "..."}
+        </div>
       </div>
     </div>
   );

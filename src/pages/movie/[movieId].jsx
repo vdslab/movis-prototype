@@ -78,7 +78,7 @@ const MovieDetails = ({ query: { movieId } }) => {
             </h1>
             {data.Actor.reduce(
               (a, c, i) =>
-                i % 4 == 0
+                i % 6 == 0
                   ? [...a, [c]]
                   : [...a.slice(0, -1), [...a[a.length - 1], c]],
               []
@@ -88,7 +88,7 @@ const MovieDetails = ({ query: { movieId } }) => {
                   {array.map((actor) => {
                     return (
                       <Link href={`/actor/${actor.id}`} key={actor.id}>
-                        <a className="column is-3">
+                        <a className="column is-2">
                           <ActorCard name={actor.name} id={actor.id} />
                         </a>
                       </Link>

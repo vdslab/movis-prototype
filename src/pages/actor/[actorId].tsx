@@ -150,7 +150,7 @@ const ActorDetails = ({ data }: Props) => {
   return (
     <Layout>
       {data && (
-        <main className="section">
+        <main className="mt-5 section">
           <div className="columns">
             <div className="column is-3">
               <img width="300px" height="450px" src={actorImgUrl} />
@@ -231,8 +231,8 @@ const ActorDetails = ({ data }: Props) => {
             </div>
           </div>
 
-          <div className="columns">
-            <div className="ml-2 column is-7" style={{ height: "1000px" }}>
+          <div className="columns is-multiline">
+            <div className="column is-12" style={{ height: "500px" }}>
               <Responsive
                 render={(width, height) => {
                   return (
@@ -249,8 +249,14 @@ const ActorDetails = ({ data }: Props) => {
               ></Responsive>
             </div>
 
-            <div className="column">
-              <div className="columns is-multiline">
+            <div className="column is-12">
+              <div
+                className="columns is-multiline-------"
+                style={{
+                  overflowX: "auto",
+                  // whiteSpace: "nowrap",
+                }}
+              >
                 {movieImgUrls.map(({ id, imgUrl }) => {
                   if (
                     selected.length === 0 ||
@@ -265,7 +271,7 @@ const ActorDetails = ({ data }: Props) => {
                   ) {
                     return (
                       <Link href={`/movie/${id}`} key={id}>
-                        <a className="column is-6">
+                        <a className="column is-2">
                           <Card caption={movies[id].title} imgUrl={imgUrl} />
                         </a>
                       </Link>
