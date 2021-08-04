@@ -34,6 +34,7 @@ export default function Graph({
   handleSelect,
   width,
   height,
+  count,
 }) {
   const [nodes, setNodes] = useState([]); //useEffect内でselectedが更新されるごとにデータも更新していく
   const [links, setLinks] = useState([]);
@@ -240,7 +241,7 @@ export default function Graph({
     // <div ref={wrapperRef} width="100" height="100">
     <div
       style={{
-        border: `${borderWeight}px solid gray`,
+        border: `${borderWeight}px solid #FCE08A`,
         width: Math.min(width, height),
         height: Math.min(width, height),
       }}
