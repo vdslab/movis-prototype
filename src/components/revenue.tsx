@@ -34,8 +34,8 @@ export const Revenue = ({ data }: { data: Movie[] }) => {
           return (
             <div
               key={d.title as string}
-              className="column is-4 is-text-center is-inline-block"
-              style={{ height: "300px", marginBottom: "50px" }}
+              className="column is-4-desktop my-6 is-12-mobile has-text-centered is-inline-block"
+              style={{ height: "300px" }}
             >
               <h2 className="subtitle">{d.title}</h2>
               <ResponsiveCirclePacking
@@ -48,7 +48,7 @@ export const Revenue = ({ data }: { data: Movie[] }) => {
                 childColor={{ from: "color", modifiers: [["brighter", 0.4]] }}
                 padding={4}
                 enableLabels={true}
-                labelsSkipRadius={0}
+                labelsSkipRadius={18}
                 labelTextColor={{ from: "color", modifiers: [["darker", 3]] }}
                 borderWidth={1}
                 borderColor={{ from: "color", modifiers: [["darker", 0.5]] }}
