@@ -249,7 +249,7 @@ const ActorDetails = ({ data }: Props) => {
               ></Responsive>
             </div>
 
-            <div className="column is-12">
+            <div className="column is-12" style={{ height: "400px" }}>
               <div
                 className="columns is-multiline-------"
                 style={{
