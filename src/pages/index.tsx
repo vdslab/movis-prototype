@@ -190,7 +190,7 @@ const Home: React.VFC<ServerSideProps> = ({ query: { page, name }, data }) => {
             </div>
           </div>
         </div>
-        <div className="container" style={{ height: "500px" }}>
+        <div className="container">
           <Revenue data={data} />
         </div>
       </section>

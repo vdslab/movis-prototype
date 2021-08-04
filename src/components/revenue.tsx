@@ -26,14 +26,13 @@ export const Revenue = ({ data }: { data: Movie[] }) => {
         className="columns"
         style={{
           overflowX: "auto",
-          whiteSpace: "nowrap",
         }}
       >
         {graphData.children.map((d) => {
           return (
             <div
               className="column is-4 is-text-center is-inline-block"
-              style={{ height: "600px" }}
+              style={{ height: "300px", marginBottom: "50px" }}
             >
               <h2 className="subtitle">{d.title}</h2>
               <ResponsiveCirclePacking
