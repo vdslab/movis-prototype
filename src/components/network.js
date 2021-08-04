@@ -287,12 +287,11 @@ export default function Graph({
               const normalizedCount =
                 max > 1 ? (count[node.id] - min) / (max - min) : 0.5;
               return (
-                <g key={i}>
+                <g key={i} onClick={() => handleSelect(node)}>
                   <circle
                     r={node.r}
                     cx={node.x}
                     cy={node.y}
-                    onClick={() => handleSelect(node)}
                     fill={
                       selected.includes(node.id)
                         ? "#FFB300" //selectedNodeColor(normalizedCount)
