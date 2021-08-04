@@ -1,19 +1,23 @@
-import { Actor } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import ActorCard from "~/components/actor-card";
 import Layout from "~/components/layout";
 import { GetServerSideProps } from "next";
+import { forceSerialize } from "~/lib/forceSerialize";
+import { Movie, PrismaClient, Actor } from "@prisma/client";
+import { Revenue } from "~/components/revenue";
 
 interface ServerSideProps {
   query: {
     page?: string;
     name?: string;
   };
+  data: Movie[];
 }
+const prisma = new PrismaClient();
 
-const Home: React.VFC<ServerSideProps> = ({ query: { page, name } }) => {
+const Home: React.VFC<ServerSideProps> = ({ query: { page, name }, data }) => {
   const [input, setInput] = useState({ name });
   const [actors, setActors] = useState<Actor[]>([]);
   console.log(actors);
@@ -186,6 +190,9 @@ const Home: React.VFC<ServerSideProps> = ({ query: { page, name } }) => {
             </div>
           </div>
         </div>
+        <div className="container" style={{ height: "500px" }}>
+          <Revenue data={data} />
+        </div>
       </section>
     </Layout>
   );
@@ -195,12 +202,23 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const name = context.query.name ? String(context.query.name) : "";
   const page = context.query.page ? String(context.query.page) : "1";
 
+  const movie = await prisma.movie.findMany({
+    where: {
+      AND: {
+        revenue: {
+          not: null,
+        },
+      },
+    },
+  });
+
   return {
     props: {
       query: {
         name,
         page,
       },
+      data: forceSerialize(movie),
     },
   };
 };
