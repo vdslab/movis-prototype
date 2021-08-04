@@ -21,7 +21,7 @@ function ZoomableSVG({ width, height, children }) {
       className="graph"
       width={width}
       height={height}
-      // viewBox={`0 0 ${width} ${height}`}
+      viewBox={`0 0 ${width} ${height}`}
     >
       <g transform={`translate(${x},${y})scale(${k})`}>{children}</g>
     </svg>
@@ -47,6 +47,14 @@ export default function Graph({
   // const height = window.innerHeight;
   const borderWeight = 1;
   const svgSize = Math.min(width, height) - borderWeight * 2;
+
+  const max = Math.max(...Object.keys(count).map((key) => count[key]));
+  const min = Math.min(...Object.keys(count).map((key) => count[key]));
+
+  const normalNodeColor = d3.interpolateGreens;
+  const highlightNodeColor = d3.interpolateOranges;
+  const selectedNodeColor = d3.interpolateBlues;
+  // d3.scaleSequential(d3.interpolateRainbow).domain([0, 20]);
 
   //   window.innerWidth < halfwidth
   //     ? window.innerWidth * 0.9
@@ -269,6 +277,8 @@ export default function Graph({
           </g>
           <g>
             {nodes.map((node, i) => {
+              const normalizedCount =
+                max > 1 ? (count[node.id] - min) / (max - min) : 0.5;
               return (
                 <g key={i}>
                   <circle
@@ -278,14 +288,14 @@ export default function Graph({
                     onClick={() => handleSelect(node)}
                     fill={
                       selected.includes(node.id)
-                        ? "black"
+                        ? selectedNodeColor(normalizedCount)
                         : selected.length === 0
-                        ? "silver"
+                        ? normalNodeColor(normalizedCount)
                         : selected.every((select, i) => {
                             return highlightnode[`${select}`].includes(node.id);
                           })
-                        ? "red"
-                        : "silver"
+                        ? highlightNodeColor(normalizedCount)
+                        : normalNodeColor(normalizedCount)
                     } //ここをどう変えるか
                     style={{ stroke: "black", strokeWidth: "1.0px" }}
                     // highlightnode.includes(node.id) ? "black" : "silver"
