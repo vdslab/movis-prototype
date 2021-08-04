@@ -10,6 +10,7 @@ import prisma from "~/lib/prisma";
 import dynamic from "next/dynamic";
 import { ResponsiveTreeMap } from "@nivo/treemap";
 import { ResponsiveLine } from "@nivo/line";
+import { Responsive } from "~/components/responsive";
 
 const Network = dynamic(() => import("~/components/network"), { ssr: false });
 
@@ -225,11 +226,19 @@ const ActorDetails = ({ data }: Props) => {
               className="ml-2 column is-7 has-background-"
               style={{ height: "1000px" }}
             >
-              <Network
-                initialNetwork={initialNetwork}
-                selected={selected}
-                handleSelect={handleSelect}
-              />
+              <Responsive
+                render={(width, height) => {
+                  return (
+                    <Network
+                      initialNetwork={initialNetwork}
+                      selected={selected}
+                      handleSelect={handleSelect}
+                      width={width}
+                      height={height}
+                    />
+                  );
+                }}
+              ></Responsive>
             </div>
 
             <div className="column">

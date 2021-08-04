@@ -21,14 +21,20 @@ function ZoomableSVG({ width, height, children }) {
       className="graph"
       width={width}
       height={height}
-      viewBox={`0 0 ${width} ${height}`}
+      // viewBox={`0 0 ${width} ${height}`}
     >
       <g transform={`translate(${x},${y})scale(${k})`}>{children}</g>
     </svg>
   );
 }
 
-export default function Graph({ initialNetwork, selected, handleSelect }) {
+export default function Graph({
+  initialNetwork,
+  selected,
+  handleSelect,
+  width,
+  height,
+}) {
   const [nodes, setNodes] = useState([]); //useEffect内でselectedが更新されるごとにデータも更新していく
   const [links, setLinks] = useState([]);
   const [highlightnode, sethighlightNode] = useState({}); //これをアクターの方で実装して、赤と黒をまとめた配列をあくたーから持ってくればいいのかな？
@@ -36,8 +42,10 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
   // 添え字sourceとtargetのhighlight=Trueとか入れたりするといいかも？　setNodes.slice
   // const halfwidth = 600;
   //これは自分に合わせた大きさ
-  const width = window.innerWidth * 0.46;
-  const height = window.innerHeight;
+  // const width = window.innerWidth * 0.46;
+  // const height = window.innerHeight;
+  const borderWeight = 1;
+  const svgSize = Math.min(width, height) - borderWeight * 2;
 
   //   window.innerWidth < halfwidth
   //     ? window.innerWidth * 0.9
@@ -130,20 +138,21 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
             .distance((d) => 10)
             .id((d) => d.id)
         )
-        .force("center", d3.forceCenter(width / 2, height / 2))
+        // .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("center", d3.forceCenter(svgSize / 2, svgSize / 2))
         .force("charge", d3.forceManyBody().strength(-1000)) //縮小していいかどうか全体を描画してから縮小一番上のノードと一番下のノードの高さ（横も叱り）の絶対値から全体の描画の大きさがわかる
         .force(
           "x",
           d3
             .forceX()
-            .x(width / 2)
+            .x(svgSize / 2)
             .strength(0.9)
         )
         .force(
           "y",
           d3
             .forceY()
-            .y(height / 2)
+            .y(svgSize / 2)
             .strength(0.9)
         );
 
@@ -229,8 +238,15 @@ export default function Graph({ initialNetwork, selected, handleSelect }) {
   }, [selected, nodes, links]);
   return (
     // <div ref={wrapperRef} width="100" height="100">
-    <div width="100" height="100">
-      <ZoomableSVG width={width} height={height}>
+    <div
+      style={{
+        border: `${borderWeight}px solid gray`,
+        width: Math.min(width, height),
+        height: Math.min(width, height),
+      }}
+    >
+      <ZoomableSVG width={svgSize} height={svgSize}>
+        {/* <ZoomableSVG width={width} height={height}> */}
         <g>
           <g>
             {links.map((link, i) => {
