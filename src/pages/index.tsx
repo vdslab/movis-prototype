@@ -73,14 +73,14 @@ const Home: React.VFC<ServerSideProps> = ({ query: { page, name }, data }) => {
   return (
     <Layout>
       <section className="section">
-        <div className="columns">
-          <div className="column is-one-quarter">
+        <div className="columns is-multiline">
+          <div className="column is-12">
             <div className="box">
               <form>
                 <div className="py-4">
                   <label className="label">俳優名</label>
                   <div className="field has-addons">
-                    <div className="control">
+                    <div className="control is-expanded">
                       <input
                         name="name"
                         className="input"
@@ -167,7 +167,7 @@ const Home: React.VFC<ServerSideProps> = ({ query: { page, name }, data }) => {
               {actors
                 .reduce(
                   (a, c, i) =>
-                    i % 4 == 0
+                    i % 6 == 0
                       ? [...a, [c]]
                       : [...a.slice(0, -1), [...a[a.length - 1], c]],
                   []
@@ -178,7 +178,7 @@ const Home: React.VFC<ServerSideProps> = ({ query: { page, name }, data }) => {
                       {array.map((actor) => {
                         return (
                           <Link href={`/actor/${actor.id}`} key={actor.id}>
-                            <a className="column is-3">
+                            <a className="column is-2">
                               <ActorCard name={actor.name} id={actor.id} />
                             </a>
                           </Link>

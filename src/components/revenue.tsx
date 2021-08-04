@@ -1,7 +1,9 @@
 import { ResponsiveCirclePacking } from "@nivo/circle-packing";
 import { Movie } from "@prisma/client";
+import { useRouter } from "next/router";
 
 export const Revenue = ({ data }: { data: Movie[] }) => {
+  const router = useRouter();
   const yearSet = new Set();
   data.forEach((movie) => {
     const year = (movie.releaseDate as any).slice(0, 4);
@@ -31,6 +33,7 @@ export const Revenue = ({ data }: { data: Movie[] }) => {
         {graphData.children.map((d) => {
           return (
             <div
+              key={d.title as string}
               className="column is-4 is-text-center is-inline-block"
               style={{ height: "300px", marginBottom: "50px" }}
             >
@@ -60,7 +63,7 @@ export const Revenue = ({ data }: { data: Movie[] }) => {
                     spacing: 8,
                   },
                 ]}
-                onClick={(e) => console.log(e)}
+                onClick={(e: any) => router.push(`/movie/${e.data.id}`)}
               />
             </div>
           );
