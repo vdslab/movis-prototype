@@ -11,6 +11,7 @@ import dynamic from "next/dynamic";
 import { ResponsiveTreeMap } from "@nivo/treemap";
 import { ResponsiveLine } from "@nivo/line";
 import { Responsive } from "~/components/responsive";
+import { CLIENT_RENEG_LIMIT } from "tls";
 
 const Network = dynamic(() => import("~/components/network"), { ssr: false });
 
@@ -45,31 +46,29 @@ const ActorDetails = ({ data }: Props) => {
   data.Movie.forEach((movie) => {
     movies[movie.id] = movie;
   });
-  const wrapperStyle = {
-    height: "600px",
-  };
+
   const yearSet = new Set();
   data.Movie.forEach((movie) => {
     const year = (movie.releaseDate as any).slice(0, 4);
     yearSet.add(year);
   });
   const years = Array.from(yearSet).sort((a, b) => Number(a) - Number(b));
-  const treeMapData = {
-    title: "movies",
-    children: years.map((year) => {
-      return {
-        title: year,
-        children: data.Movie.filter(
-          (movie) => (movie.releaseDate as any).slice(0, 4) === year
-        ).map((movie) => {
-          return {
-            title: movie.title,
-            count: 1,
-          };
-        }),
-      };
-    }),
-  };
+  // const treeMapData = {
+  //   title: "movies",
+  //   children: years.map((year) => {
+  //     return {
+  //       title: year,
+  //       children: data.Movie.filter(
+  //         (movie) => (movie.releaseDate as any).slice(0, 4) === year
+  //       ).map((movie) => {
+  //         return {
+  //           title: movie.title,
+  //           count: 1,
+  //         };
+  //       }),
+  //     };
+  //   }),
+  // };
 
   const lineData = [
     {
@@ -100,24 +99,29 @@ const ActorDetails = ({ data }: Props) => {
   nodes.sort(compare);
 
   const sourceTarget = {};
+  const count = {};
   data.Movie.forEach((movie) => {
-    const sortedActors = Array.from(movie.Actor).sort(compare);
-    sortedActors.forEach((source, index) => {
-      if (source.id !== actorId) {
-        const targets = [];
-        sortedActors.slice(index).forEach((target) => {
-          if (source.id !== target.id && target.id !== actorId) {
-            targets.push(target.id);
-          }
-        });
+    movie.Actor.forEach((source) => {
+      if (!(source.id in sourceTarget)) {
         sourceTarget[source.id] = {};
-        targets.forEach((target) => {
-          sourceTarget[source.id][target] =
-            (sourceTarget[source.id][target] || 0) + 1;
-        });
+        count[source.id] = 0;
       }
     });
   });
+
+  data.Movie.forEach((movie) => {
+    const sortedActors = Array.from(movie.Actor)
+      .sort(compare)
+      .filter((actor) => actor.id !== actorId);
+    sortedActors.forEach((source, index) => {
+      ++count[source.id];
+      sortedActors.slice(index + 1).forEach((target) => {
+        sourceTarget[source.id][target.id] =
+          (sourceTarget[source.id][target.id] || 0) + 1;
+      });
+    });
+  });
+  console.log(count);
 
   const links = [];
   for (const source in sourceTarget) {
@@ -155,10 +159,13 @@ const ActorDetails = ({ data }: Props) => {
               className="column"
               // className="column is-flex is-align-items-center"
             >
-              <div>
-                <h1 className="title">{actorName}</h1>
-              </div>
-              {/* <div style={wrapperStyle}>
+              <div
+              // className="is-flex is-flex-direction-column is-justify-content-space-between"
+              >
+                <div style={{ margin: "0 0 0 20px" }}>
+                  <h1 className="title">{actorName}</h1>
+                </div>
+                {/* <div style={wrapperStyle}>
                 <ResponsiveTreeMap
                   data={treeMapData}
                   identity="title"
@@ -179,53 +186,53 @@ const ActorDetails = ({ data }: Props) => {
                   borderColor={{ from: "color", modifiers: [["darker", 0.1]] }}
                 />
               </div> */}
-              <div style={{ height: "300px" }}>
-                <ResponsiveLine
-                  data={lineData}
-                  margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
-                  xScale={{ type: "point" }}
-                  yScale={{
-                    type: "linear",
-                    min: 0,
-                    max: "auto",
-                    stacked: true,
-                    reverse: false,
-                  }}
-                  axisRight={null}
-                  lineWidth={5}
-                  {...{ yScale: undefined }}
-                  axisBottom={{
-                    tickSize: 5,
-                    tickPadding: 5,
-                    tickRotation: 0,
-                    legendOffset: 36,
-                    legendPosition: "middle",
-                  }}
-                  axisLeft={{
-                    tickSize: 5,
-                    tickPadding: 5,
-                    tickRotation: 0,
-                    legendOffset: -40,
-                    legendPosition: "middle",
-                  }}
-                  pointSize={10}
-                  pointColor={{ theme: "background" }}
-                  pointBorderWidth={2}
-                  pointBorderColor={{ from: "serieColor" }}
-                  pointLabelYOffset={-12}
-                  pointLabel="y"
-                  useMesh={true}
-                  colors={{ scheme: "paired" }}
-                />
+                <div style={{ height: "363px" }}>
+                  <ResponsiveLine
+                    data={lineData}
+                    margin={{ top: 20, right: 20, bottom: 30, left: 20 }}
+                    xScale={{ type: "point" }}
+                    yScale={{
+                      type: "linear",
+                      min: 0,
+                      max: "auto",
+                      stacked: true,
+                      reverse: false,
+                    }}
+                    axisRight={null}
+                    lineWidth={5}
+                    {...{ yScale: undefined }}
+                    axisBottom={{
+                      tickSize: 5,
+                      tickPadding: 5,
+                      tickRotation: 0,
+                      legendOffset: 36,
+                      legendPosition: "middle",
+                    }}
+                    enablePointLabel={true}
+                    // axisLeft={{
+                    //   tickSize: 5,
+                    //   tickPadding: 5,
+                    //   tickRotation: 0,
+                    //   legendOffset: -40,
+                    //   legendPosition: "middle",
+                    // }}
+                    axisLeft={null}
+                    pointSize={10}
+                    pointColor={{ theme: "background" }}
+                    pointBorderWidth={2}
+                    pointBorderColor={{ from: "serieColor" }}
+                    pointLabelYOffset={-12}
+                    pointLabel="y"
+                    useMesh={true}
+                    colors={{ scheme: "paired" }}
+                  />
+                </div>
               </div>
             </div>
           </div>
 
           <div className="columns">
-            <div
-              className="ml-2 column is-7 has-background-"
-              style={{ height: "1000px" }}
-            >
+            <div className="ml-2 column is-7" style={{ height: "1000px" }}>
               <Responsive
                 render={(width, height) => {
                   return (
@@ -235,6 +242,7 @@ const ActorDetails = ({ data }: Props) => {
                       handleSelect={handleSelect}
                       width={width}
                       height={height}
+                      count={count}
                     />
                   );
                 }}
