@@ -47,12 +47,12 @@ const ActorDetails = ({ data }: Props) => {
     movies[movie.id] = movie;
   });
 
-  const yearSet = new Set();
-  data.Movie.forEach((movie) => {
-    const year = (movie.releaseDate as any).slice(0, 4);
-    yearSet.add(year);
-  });
-  const years = Array.from(yearSet).sort((a, b) => Number(a) - Number(b));
+  // const yearSet = new Set();
+  // data.Movie.forEach((movie) => {
+  //   const year = (movie.releaseDate as any).slice(0, 4);
+  //   yearSet.add(year);
+  // });
+  // const years = Array.from(yearSet).sort((a, b) => Number(a) - Number(b));
   // const treeMapData = {
   //   title: "movies",
   //   children: years.map((year) => {
@@ -70,19 +70,19 @@ const ActorDetails = ({ data }: Props) => {
   //   }),
   // };
 
-  const lineData = [
-    {
-      id: actorName,
-      data: years.map((year) => {
-        return {
-          x: year as string,
-          y: data.Movie.filter(
-            (movie) => (movie.releaseDate as any).slice(0, 4) === year
-          ).length,
-        };
-      }),
-    },
-  ];
+  // const lineData = [
+  //   {
+  //     id: actorName,
+  //     data: years.map((year) => {
+  //       return {
+  //         x: year as string,
+  //         y: data.Movie.filter(
+  //           (movie) => (movie.releaseDate as any).slice(0, 4) === year
+  //         ).length,
+  //       };
+  //     }),
+  //   },
+  // ];
 
   const nodeIds = [];
   const nodes = [];
@@ -186,7 +186,7 @@ const ActorDetails = ({ data }: Props) => {
                   borderColor={{ from: "color", modifiers: [["darker", 0.1]] }}
                 />
               </div> */}
-                <div style={{ height: "363px" }}>
+                {/* <div style={{ height: "363px" }}>
                   <ResponsiveLine
                     data={lineData}
                     margin={{ top: 20, right: 20, bottom: 30, left: 20 }}
@@ -226,7 +226,7 @@ const ActorDetails = ({ data }: Props) => {
                     useMesh={true}
                     colors={{ scheme: "paired" }}
                   />
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
