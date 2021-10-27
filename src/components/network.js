@@ -36,10 +36,14 @@ export default function Graph({
   height,
   count,
 }) {
+  const handleChange = (e) => {
+    setInput(e.target.value);
+  };
   const [nodes, setNodes] = useState([]); //useEffect内でselectedが更新されるごとにデータも更新していく
   const [links, setLinks] = useState([]);
   const [highlightnode, sethighlightNode] = useState({}); //これをアクターの方で実装して、赤と黒をまとめた配列をあくたーから持ってくればいいのかな？
   const [highlightlist, sethighlightList] = useState([]);
+  const [input, setInput] = useState("");
   // 添え字sourceとtargetのhighlight=Trueとか入れたりするといいかも？　setNodes.slice
   // const halfwidth = 600;
   //これは自分に合わせた大きさ
@@ -252,75 +256,96 @@ export default function Graph({
   }, [selected, nodes, links]);
   return (
     // <div ref={wrapperRef} width="100" height="100">
-    <div
-      style={{
-        border: `${borderWeight}px solid #FCE08A`,
-        // width: Math.min(width, height),
-        // height: Math.min(width, height),
-        width,
-        height,
-      }}
-    >
-      <ZoomableSVG width={width} height={height}>
-        {/* <ZoomableSVG width={width} height={height}> */}
-        <g>
+    <div>
+      <div>
+        <input
+          name="name"
+          className="input"
+          type="text"
+          value={input}
+          placeholder="俳優を検索"
+          onChange={(e) => handleChange(e)}
+        />
+      </div>
+      <div
+        style={{
+          border: `${borderWeight}px solid #FCE08A`,
+          // width: Math.min(width, height),
+          // height: Math.min(width, height),
+          width,
+          height,
+        }}
+      >
+        <ZoomableSVG width={width} height={height}>
+          {/* <ZoomableSVG width={width} height={height}> */}
           <g>
-            {links.map((link, i) => {
-              const target = link.target.id;
-              const source = link.source.id;
-              return (
-                <g key={i}>
-                  <line
-                    x1={link.target.x}
-                    y1={link.target.y}
-                    x2={link.source.x}
-                    y2={link.source.y}
-                    strokeWidth="1"
-                    stroke={link.highlight}
-                  />
-                </g>
-              );
-            })}
-          </g>
-          <g>
-            {nodes.map((node, i) => {
-              const normalizedCount =
-                max > 1 ? (count[node.id] - min) / (max - min) : 0.5;
-              return (
-                <g key={i} onClick={() => handleSelect(node)}>
-                  <circle
-                    r={node.r}
-                    cx={node.x}
-                    cy={node.y}
-                    fill={
-                      selected.includes(node.id)
-                        ? "#FFB300" //selectedNodeColor(normalizedCount)
-                        : selected.length === 0
-                        ? normalNodeColor(normalizedCount)
-                        : selected.every((select, i) => {
-                            return highlightnode[`${select}`].includes(node.id);
-                          })
-                        ? highlightNodeColor(normalizedCount)
-                        : normalNodeColor(normalizedCount)
-                    } //ここをどう変えるか
-                    style={{ stroke: "#546E7A", strokeWidth: "1px" }}
-                    // highlightnode.includes(node.id) ? "black" : "silver"
-                  />
+            <g>
+              {links.map((link, i) => {
+                const target = link.target.id;
+                const source = link.source.id;
+                return (
+                  <g key={i}>
+                    <line
+                      x1={link.target.x}
+                      y1={link.target.y}
+                      x2={link.source.x}
+                      y2={link.source.y}
+                      strokeWidth="1"
+                      stroke={link.highlight}
+                    />
+                  </g>
+                );
+              })}
+            </g>
+            <g>
+              {nodes.map((node, i) => {
+                const normalizedCount =
+                  max > 1 ? (count[node.id] - min) / (max - min) : 0.5;
+                return (
+                  <g key={i} onClick={() => handleSelect(node)}>
+                    <circle
+                      r={node.r}
+                      cx={node.x}
+                      cy={node.y}
+                      fill={
+                        selected.includes(node.id)
+                          ? "#FFB300" //selectedNodeColor(normalizedCount)
+                          : selected.length === 0
+                          ? normalNodeColor(normalizedCount)
+                          : selected.every((select, i) => {
+                              return highlightnode[`${select}`].includes(
+                                node.id
+                              );
+                            })
+                          ? highlightNodeColor(normalizedCount)
+                          : normalNodeColor(normalizedCount)
+                      } //ここをどう変えるか
+                      style={{ stroke: "#546E7A", strokeWidth: "1px" }}
+                      // highlightnode.includes(node.id) ? "black" : "silver"
+                    />
 
-                  <text
-                    className="kanekyo"
-                    // fill="black"
-                    x={node.x + 12}
-                    y={node.y + 5}
-                  >
-                    {node.name}
-                  </text>
-                </g>
-              );
-            })}
+                    <text
+                      className="kanekyo"
+                      // fill="black"
+                      x={node.x + 12}
+                      y={node.y + 5}
+                      fill={
+                        input === ""
+                          ? "black"
+                          : node.name.includes(input)
+                          ? "black"
+                          : "gray"
+                      }
+                    >
+                      {node.name}
+                    </text>
+                  </g>
+                );
+              })}
+            </g>
           </g>
-        </g>
-      </ZoomableSVG>
+        </ZoomableSVG>
+      </div>
     </div>
   );
 }
